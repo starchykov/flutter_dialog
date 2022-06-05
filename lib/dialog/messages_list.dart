@@ -1,13 +1,20 @@
 import 'dart:developer';
 import 'dart:ui';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dialog/common/no_data_display.dart';
-import 'package:flutter_dialog/common/responsive.dart';
+import 'package:flutter_dialog/dialog/message_actions.dart';
+import 'package:flutter_dialog/dialog/message_item.dart';
 import 'package:flutter_dialog/dialog/messages_page.dart';
 import 'package:flutter_dialog/models/message_model.dart';
+
+enum Actions {
+  resent,
+  cancelsending,
+  copy,
+  delete,
+}
 
 class CommentsList extends StatefulWidget {
   final List<Message> comments;
@@ -23,6 +30,7 @@ class _CommentsListState extends State<CommentsList> {
   /// Work page actions state
   bool _isFloatingOpen = false;
   late OverlayEntry _floating;
+  List<Actions> availableActions = [Actions.copy, Actions.delete];
 
   @override
   void initState() {
@@ -31,18 +39,16 @@ class _CommentsListState extends State<CommentsList> {
   }
 
   Future _scrollListener() async {
-    if (widget.controller.offset >= widget.controller.position.maxScrollExtent &&
-        !widget.controller.position.outOfRange) {}
-    if (widget.controller.offset <= widget.controller.position.minScrollExtent &&
-        !widget.controller.position.outOfRange) {
+    if (widget.controller.offset >= widget.controller.position.maxScrollExtent && !widget.controller.position.outOfRange) {}
+    if (widget.controller.offset <= widget.controller.position.minScrollExtent && !widget.controller.position.outOfRange) {
       await CommentPage.of(context)?.loadComments();
     }
   }
 
   /// Show available actions for selected message
-  Future _showActions({required Key key, required bool current, required int index}) async {
+  void _showActions({required GlobalKey key, required bool current, required int index}) {
+    HapticFeedback.heavyImpact();
     setState(() {
-      HapticFeedback.heavyImpact();
       if (_isFloatingOpen) return _floating.remove();
       _floating = _createFloating(key: key, index: index, current: current);
       Overlay.of(context)?.insert(_floating);
@@ -51,60 +57,90 @@ class _CommentsListState extends State<CommentsList> {
   }
 
   /// Close actions panel
-  void _closeActions(a, offset) {
-    if (a.position.dy < offset.dy || a.position.dy > offset.dy + 150 && _isFloatingOpen) {
+  void _closeActions() {
+    if (_isFloatingOpen == true) {
       _floating.remove();
-      log(a.toString());
       setState(() => _isFloatingOpen = !_isFloatingOpen);
     }
   }
 
   /// Copy note to clipboard
   Future _copyNote({required int index}) async {
+    log('Copy action', name: runtimeType.toString());
     HapticFeedback.heavyImpact();
     await Clipboard.setData(ClipboardData(text: widget.comments[index].message));
-    if (_isFloatingOpen) _floating.remove();
-    setState(() => _isFloatingOpen = !_isFloatingOpen);
+    _closeActions();
   }
 
   /// Copy note to clipboard
   Future _deleteNote({required int index}) async {
+    log('Delete action', name: runtimeType.toString());
     HapticFeedback.heavyImpact();
-    if (_isFloatingOpen) _floating.remove();
-    setState(() => _isFloatingOpen = !_isFloatingOpen);
+    _closeActions();
   }
 
-  OverlayEntry _createFloating({key, required int index, required bool current}) {
-    RenderBox renderBox = key.currentContext.findRenderObject();
-    Offset offset = renderBox.localToGlobal(Offset.zero);
-    double messageHeight = (renderBox.size.height);
+  OverlayEntry _createFloating({required GlobalKey key, required int index, required bool current}) {
+    availableActions = [Actions.copy, Actions.delete];
+    if (widget.comments[index].isPending == 0) availableActions.add(Actions.copy);
+    if (widget.comments[index].isPending == 0) availableActions.add(Actions.delete);
+    if (widget.comments[index].isPending == 2) availableActions.add(Actions.resent);
+    int count = availableActions.length;
+
+    final RenderBox renderBox = key.currentContext?.findRenderObject() as RenderBox;
+    final double messageHeight = renderBox.size.height;
+
+    /// Calculate message position
+    final Size screen = MediaQuery.of(context).size;
+    final Offset offset = renderBox.localToGlobal(Offset.zero);
+    final bool lastItem = offset.dy > (screen.height - messageHeight - 100);
+
+    /// Wrapper margin/padding(50) + (acton height * item count) + (divider height * item count)
+    final double offsetY = lastItem ? (offset.dy - (50 + (30 * count) + (11 * (count - 1)))) : (offset.dy - 20);
+
     return OverlayEntry(
-      builder: (context) => Listener(
-        onPointerDown: (a) => _closeActions(a, offset),
+      builder: (context) => GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: () => _closeActions(),
         child: Stack(
           children: [
             BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
               child: Container(height: MediaQuery.of(context).size.height, color: Colors.black45),
             ),
             Positioned(
               left: current ? 0 : 10,
               right: current ? 10 : 0,
-              top: offset.dy > (MediaQuery.of(context).size.height - messageHeight - 100)
-                  ? (offset.dy - 20 - 100)
-                  : (offset.dy - 20),
+              top: offsetY,
               child: Column(
                 textDirection: current ? TextDirection.ltr : TextDirection.ltr,
                 crossAxisAlignment: current ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                 children: [
                   Visibility(
-                    visible: offset.dy > MediaQuery.of(context).size.height - (renderBox.size.height + 100),
-                    child: _actions(index: index, current: current),
+                    visible: offset.dy > screen.height - (renderBox.size.height + 100),
+                    child: MessageActions(
+                      index: index,
+                      current: current,
+                      onCopy: ({required int index}) async => await _copyNote(index: index),
+                      onDelete: ({required int index}) async => await _deleteNote(index: index),
+                      onResent: widget.comments[index].isPending == 2
+                          ? ({required int index}) async => await _deleteNote(index: index)
+                          : null,
+                    ),
                   ),
-                  _noteItem(index: index, current: current),
+                  MessageItem(
+                    isOpen: _isFloatingOpen,
+                    isCurrent: current,
+                    onPress: ({required GlobalKey key}) => _showActions(key: key, current: current, index: index),
+                    messageItem: widget.comments[index],
+                  ),
                   Visibility(
-                    visible: !(offset.dy > MediaQuery.of(context).size.height - (renderBox.size.height + 100)),
-                    child: _actions(index: index, current: current),
+                    visible: !(offset.dy > screen.height - (renderBox.size.height + 100)),
+                    child: MessageActions(
+                      index: index,
+                      current: current,
+                      onCopy: ({required int index}) async => await _copyNote(index: index),
+                      onDelete: ({required int index}) async => await _deleteNote(index: index),
+                    ),
                   ),
                 ],
               ),
@@ -117,9 +153,8 @@ class _CommentsListState extends State<CommentsList> {
 
   @override
   Widget build(BuildContext context) {
-    bool currentUser(String user) => 'Ivan' == user;
-    String emptyText = 'no_comments_to_display';
-    if (widget.comments.isEmpty) return NoDataToDisplay(text: emptyText, top: 60);
+    bool currentUser(String user) => 'John' == user;
+    if (widget.comments.isEmpty) return const NoDataToDisplay(text: 'No data', top: 60);
     return SizedBox(
       height: MediaQuery.of(context).size.height,
       child: ListView.builder(
@@ -128,158 +163,16 @@ class _CommentsListState extends State<CommentsList> {
         physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
         itemCount: widget.comments.length,
         padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-        itemBuilder: (context, index) => _noteItem(index: index, current: currentUser(widget.comments[index].userName)),
+        itemBuilder: (context, index) {
+          bool isCurrent = currentUser(widget.comments[index].userName);
+          return MessageItem(
+            isOpen: _isFloatingOpen,
+            isCurrent: currentUser(widget.comments[index].userName),
+            onPress: ({required GlobalKey key}) => _showActions(key: key, current: isCurrent, index: index),
+            messageItem: widget.comments[index],
+          );
+        },
       ),
-    );
-  }
-
-  Widget _actions({required bool current, required int index}) => materialWrapper(
-        cu: current,
-        color: Colors.white,
-        widget: Column(
-          mainAxisSize: MainAxisSize.max,
-          textDirection: current ? TextDirection.rtl : TextDirection.ltr,
-          children: [
-            InkWell(
-              onTap: () async => await _copyNote(index: index),
-              child: SizedBox(
-                width: 100,
-                child: Row(
-                  children: const <Widget>[
-                    Text('Copy'),
-                    Spacer(),
-                    Icon(CupertinoIcons.doc_on_clipboard, color: Colors.black54, size: 20),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 10),
-            Container(height: 1, width: 100, color: Colors.black26),
-            const SizedBox(height: 10),
-            InkWell(
-              onTap: () async => await _deleteNote(index: index),
-              child: SizedBox(
-                width: 100,
-                child: Row(
-                  children: const <Widget>[
-                    Text('Delete'),
-                    Spacer(),
-                    Icon(CupertinoIcons.delete, color: Colors.redAccent, size: 20),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-
-  Widget _noteItem({required bool current, required int index}) {
-    GlobalKey key = LabeledGlobalKey(widget.comments[index].creationDate.hashCode.toString());
-    return materialWrapper(
-      cu: current,
-      tl: current ? 20 : 0,
-      tr: current ? 0 : 20,
-      color: (current ? Colors.lightGreen : Colors.grey[400])!,
-      widget: InkWell(
-        key: key,
-        onLongPress: () async => _isFloatingOpen ? null : await _showActions(key: key, current: current, index: index),
-        child: SizedBox(
-          width: _length(context, widget.comments[index].message),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 5),
-                child: Row(
-                  mainAxisAlignment: current ? MainAxisAlignment.end : MainAxisAlignment.start,
-                  children: [
-                    Flexible(
-                      child: Text(
-                        widget.comments[index].message,
-                        style: const TextStyle(fontSize: 14, color: Colors.white),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Row(
-                textDirection: current ? TextDirection.rtl : TextDirection.ltr,
-                children: [
-                  Text(
-                    widget.comments[index].creationDate,
-                    style: const TextStyle(fontSize: 12, color: Colors.white60),
-                  ),
-                  const Spacer(),
-                  if (widget.comments[index].isPending == 1)  Row(
-                    children: const <Widget>[
-                      SizedBox(width: 2),
-                      CupertinoActivityIndicator(radius: 6),
-                      SizedBox(width: 5),
-                      Text('Pending...', style: TextStyle(fontSize: 11, color: Colors.black45)),
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  double _length(BuildContext context, String text) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double messageWidth;
-
-    bool isTablet = Responsive.isTablet(context);
-    bool isMobile = Responsive.isMobile(context);
-
-    if (isTablet && text.length < 25) return messageWidth = (screenWidth * .15) - 10;
-    if (isTablet && text.length > 25 && text.length <= 90) return messageWidth = (text.length * 8).toDouble();
-    if (isTablet && text.length >= 90) return messageWidth = (screenWidth * .5) - 10;
-
-    if (isMobile && text.length < 25) return messageWidth = (screenWidth * .37);
-    if (isMobile && text.length >= 25 && text.length <= 50) return messageWidth = (text.length * 6).toDouble();
-    if (isMobile && text.length >= 50) return messageWidth = (screenWidth * .8) - 10;
-
-    messageWidth = screenWidth * .5;
-
-    return messageWidth;
-  }
-
-  /// Material wrapper container
-  Widget materialWrapper({
-    required Widget widget,
-    Color color = Colors.lightGreen,
-    required bool cu,
-    double bl = 20,
-    double tl = 20,
-    double br = 20,
-    double tr = 20,
-  }) {
-    return Row(
-      key: Key(widget.toString().hashCode.toString()),
-      mainAxisAlignment: cu ? MainAxisAlignment.end : MainAxisAlignment.start,
-      children: [
-        Material(
-          color: Colors.transparent,
-          child: Container(
-            margin: EdgeInsets.only(left: cu ? 35 : 0, top: 5, right: cu ? 0 : 35, bottom: 5),
-            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(bl),
-                bottomRight: Radius.circular(br),
-                topLeft: Radius.circular(tl),
-                topRight: Radius.circular(tr),
-              ),
-            ),
-            child: widget,
-          ),
-        ),
-      ],
     );
   }
 }

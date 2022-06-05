@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dialog/models/message_model.dart';
 
 import 'messages_page.dart';
 
@@ -36,10 +35,12 @@ class AddCommentState extends State<AddComment> {
     _addFormKey.currentState!.save();
     //Message commentModel = Message('Ivan', _textCommentController.text, 0, DateTime.now().toString());
     //await _commentController.createComment(commentModel);
-    CommentPage.of(context)!.loadComments().then((value) => setState(() {
-          _textCommentController.text = '';
-          sending = false;
-        }));
+    await CommentPage.of(context)!.loadComments();
+
+    setState(() {
+      _textCommentController.text = '';
+      sending = false;
+    });
   }
 
   /// Check is input empty
@@ -61,8 +62,8 @@ class AddCommentState extends State<AddComment> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(CupertinoIcons.paperclip, color: Colors.grey),
-              SizedBox(width: 5),
+              const Icon(CupertinoIcons.paperclip, color: Colors.grey),
+              const SizedBox(width: 10),
               Expanded(
                 child: Container(
                   decoration: const BoxDecoration(
@@ -83,9 +84,9 @@ class AddCommentState extends State<AddComment> {
                   ),
                 ),
               ),
-              const SizedBox(width: 5),
+              const SizedBox(width: 10),
               Padding(
-                padding: const EdgeInsets.all(5),
+                padding: const EdgeInsets.symmetric(vertical: 5),
                 child: ClipOval(
                   child: Material(
                     color: isEmpty() ? Colors.lightGreen.withOpacity(.5) : Colors.lightGreen,

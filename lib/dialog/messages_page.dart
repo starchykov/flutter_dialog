@@ -50,16 +50,11 @@ class CommentPageState extends State<CommentPage> {
     ///List<Message> list = new List<Message>.from(dataDB.whereType<Message>());
 
     List<Message> list = [
-      const Message('Ivan', 'Hello Hello Hello Hello! Hello Hello Hello Hello!Hello Hello Hello Hello!Hello Hello Hello Hello!Hello Hello Hello Hello!Hello Hello Hello Hello!', 1, '15.05.2022'),
-      const Message('Anton', 'Hello Hello Hello Hello!', 0, '15.05.2022'),
-      const Message('Kota', 'Hello Hello Hello Hello!', 0, '15.05.2022'),
-      const Message('Ivan', 'Hello Hello Hello Hello!', 1, '15.05.2022'),
-      const Message('Keks', 'Hello Hello Hello Hello!', 0, '15.05.2022'),
-      const Message('Ivan', 'Hello Hello Hello Hello!', 0, '15.05.2022'),
-      const Message('Ivan', 'Hello Hello Hello Hello!', 0, '15.05.2022'),
-      const Message('Ivan', 'Hello Hello Hello Hello!', 0, '15.05.2022'),
-      const Message('Ivan', 'Hello Hello Hello Hello!', 0, '15.05.2022'),
-      const Message('Ivan', 'Hello Hello Hello Hello 123 4 ! ', 1, '15.05.2022'),
+      const Message('John', 'This is not sent message with long text: text text text text text text text text', 2, '15.05.2022'),
+      const Message('Olexei', 'Hello Hello Hello Hello!', 0, '15.05.2022'),
+      const Message('John', 'This is long text message: text text text text text text text text text text text', 1, '15.05.2022'),
+      const Message('John', 'This is example of the Flutter dialog!', 0, '15.05.2022'),
+      const Message('John', 'Hello! ', 1, '15.05.2022'),
     ];
 
     /// Set actual data from database to state. Let loading flag to false

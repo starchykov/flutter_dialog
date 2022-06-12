@@ -30,6 +30,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) => const CupertinoPageScaffold(
+        backgroundColor: CupertinoColors.lightBackgroundGray,
         navigationBar: CupertinoNavigationBar(middle: Text('Messages')),
         child: SafeArea(child: CommentPage()),
       );

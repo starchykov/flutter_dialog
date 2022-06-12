@@ -2,19 +2,20 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dialog/common/responsive.dart';
 import 'package:flutter_dialog/common/wrapper.dart';
+import 'package:flutter_dialog/constants/constants.dart';
 import 'package:flutter_dialog/models/message_model.dart';
 
 class MessageItem extends StatelessWidget {
   final bool isOpen;
   final bool isCurrent;
-  final Function onPress;
+  final Function? onPress;
   final Message messageItem;
 
   const MessageItem({
     Key? key,
-    required this.isOpen,
+    this.isOpen = true,
     required this.isCurrent,
-    required this.onPress,
+    this.onPress,
     required this.messageItem,
   }) : super(key: key);
 
@@ -43,12 +44,12 @@ class MessageItem extends StatelessWidget {
     GlobalKey key = LabeledGlobalKey(messageItem.creationDate.hashCode.toString());
     return MaterialWrapper(
       isCurrent: isCurrent,
-      tl: isCurrent ? 20 : 0,
-      tr: isCurrent ? 0 : 20,
+      topLeft: isCurrent ? 20 : 0,
+      topRight: isCurrent ? 0 : 20,
       color: (isCurrent ? Colors.lightGreen : Colors.grey[400])!,
       widget: InkWell(
         key: key,
-        onLongPress: () async => isOpen ? () {} : await onPress(key: key),
+        onLongPress: () async => isOpen && onPress != null ? () {} : await onPress!(key: key),
         child: SizedBox(
           width: _length(context, messageItem.message),
           child: Column(
@@ -56,7 +57,7 @@ class MessageItem extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(vertical: 5),
+                padding: const EdgeInsets.symmetric(vertical: kDefaultTextSpace),
                 child: Row(
                   mainAxisAlignment: isCurrent ? MainAxisAlignment.end : MainAxisAlignment.start,
                   children: [
@@ -83,7 +84,7 @@ class MessageItem extends StatelessWidget {
                       children: const <Widget>[
                         SizedBox(width: 2),
                         CupertinoActivityIndicator(radius: 6),
-                        SizedBox(width: 5),
+                        SizedBox(width: kDefaultTextSpace),
                         Text('Pending...', style: TextStyle(fontSize: 11, color: Colors.black45)),
                       ],
                     ),
@@ -94,7 +95,7 @@ class MessageItem extends StatelessWidget {
                       children: const <Widget>[
                         SizedBox(width: 2),
                         Icon(CupertinoIcons.info_circle, size: 12, color: Colors.redAccent),
-                        SizedBox(width: 5),
+                        SizedBox(width: kDefaultTextSpace),
                         Text('Not sent', style: TextStyle(fontSize: 11, color: Colors.black45)),
                       ],
                     ),

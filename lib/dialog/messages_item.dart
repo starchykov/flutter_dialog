@@ -5,7 +5,7 @@ import 'package:flutter_dialog/common/wrapper.dart';
 import 'package:flutter_dialog/constants/constants.dart';
 import 'package:flutter_dialog/models/message_model.dart';
 
-class MessageItem extends StatelessWidget {
+class MessageItem extends StatefulWidget {
   final bool isOpen;
   final bool isCurrent;
   final Function? onPress;
@@ -18,6 +18,19 @@ class MessageItem extends StatelessWidget {
     this.onPress,
     required this.messageItem,
   }) : super(key: key);
+
+  @override
+  State<MessageItem> createState() => _MessageItemState();
+}
+
+class _MessageItemState extends State<MessageItem> {
+  late final GlobalKey key;
+
+  @override
+  void initState() {
+    super.initState();
+    key = LabeledGlobalKey(widget.messageItem.message.hashCode.toString());
+  }
 
   double _length(BuildContext context, String text) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -41,17 +54,16 @@ class MessageItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    GlobalKey key = LabeledGlobalKey(messageItem.creationDate.hashCode.toString());
     return MaterialWrapper(
-      isCurrent: isCurrent,
-      topLeft: isCurrent ? 20 : 0,
-      topRight: isCurrent ? 0 : 20,
-      color: (isCurrent ? Colors.lightGreen : Colors.grey[400])!,
+      isCurrent: widget.isCurrent,
+      topLeft: widget.isCurrent ? 20 : 0,
+      topRight: widget.isCurrent ? 0 : 20,
+      color: (widget.isCurrent ? Colors.lightGreen : Colors.grey[400])!,
       widget: InkWell(
         key: key,
-        onLongPress: () async => isOpen && onPress != null ? () {} : await onPress!(key: key),
+        onLongPress: () async => widget.isOpen && widget.onPress != null ? () {} : await widget.onPress!(key: key),
         child: SizedBox(
-          width: _length(context, messageItem.message),
+          width: _length(context, widget.messageItem.message),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,11 +71,11 @@ class MessageItem extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(vertical: kDefaultTextSpace),
                 child: Row(
-                  mainAxisAlignment: isCurrent ? MainAxisAlignment.end : MainAxisAlignment.start,
+                  mainAxisAlignment: widget.isCurrent ? MainAxisAlignment.end : MainAxisAlignment.start,
                   children: [
                     Flexible(
                       child: Text(
-                        messageItem.message,
+                        widget.messageItem.message,
                         style: const TextStyle(fontSize: 14, color: Colors.white),
                       ),
                     ),
@@ -71,15 +83,15 @@ class MessageItem extends StatelessWidget {
                 ),
               ),
               Row(
-                textDirection: isCurrent ? TextDirection.rtl : TextDirection.ltr,
+                textDirection: widget.isCurrent ? TextDirection.rtl : TextDirection.ltr,
                 children: [
                   Text(
-                    messageItem.creationDate,
+                    widget.messageItem.creationDate,
                     style: const TextStyle(fontSize: 12, color: Colors.white60),
                   ),
                   const Spacer(),
                   Visibility(
-                    visible: messageItem.isPending == 1,
+                    visible: widget.messageItem.isPending == 1,
                     child: Row(
                       children: const <Widget>[
                         SizedBox(width: 2),
@@ -90,7 +102,7 @@ class MessageItem extends StatelessWidget {
                     ),
                   ),
                   Visibility(
-                    visible: messageItem.isPending == 2,
+                    visible: widget.messageItem.isPending == 2,
                     child: Row(
                       children: const <Widget>[
                         SizedBox(width: 2),

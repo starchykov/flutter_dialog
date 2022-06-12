@@ -32,6 +32,6 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) => const CupertinoPageScaffold(
         backgroundColor: CupertinoColors.lightBackgroundGray,
         navigationBar: CupertinoNavigationBar(middle: Text('Messages')),
-        child: SafeArea(child: CommentPage()),
+        child: SafeArea(child: MessagesPage()),
       );
 }

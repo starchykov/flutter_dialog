@@ -3,53 +3,48 @@ import 'package:flutter/material.dart';
 
 import 'messages_page.dart';
 
-class AddComment extends StatefulWidget {
-  const AddComment({Key? key}) : super(key: key);
+class MessagesInput extends StatefulWidget {
+  const MessagesInput({Key? key}) : super(key: key);
 
   @override
-  AddCommentState createState() => AddCommentState();
+  MessagesInputState createState() => MessagesInputState();
 }
 
-class AddCommentState extends State<AddComment> {
+class MessagesInputState extends State<MessagesInput> {
   final _addFormKey = GlobalKey<FormState>();
+  final _inputMessageController = TextEditingController();
+  bool _sending = false;
 
-  // CommentController _commentController = CommentController();
-  final _textCommentController = TextEditingController();
-  bool sending = false;
-
-  /// Check the input value. If there are no characters, an error is returned
-  String? commentValidate({required String value}) {
+  String? _commentValidate({required String value}) {
     if (value.isEmpty) return 'Error';
     if (value.length >= 500) return 'Error';
     return null;
   }
 
-  /// Add comment handler
-  void addComment() {
-    commentValidate(value: _textCommentController.text);
-    if (_addFormKey.currentState!.validate()) onPressComment();
+  void _onPressSent() {
+    _commentValidate(value: _inputMessageController.text);
+    if (_addFormKey.currentState!.validate()) _sendMessage();
   }
 
-  Future onPressComment() async {
-    setState(() => sending = true);
-    _addFormKey.currentState!.save();
+  Future _sendMessage() async {
+    setState(() => _sending = true);
+    _addFormKey.currentState!.reset();
     //Message commentModel = Message('Ivan', _textCommentController.text, 0, DateTime.now().toString());
     //await _commentController.createComment(commentModel);
-    await CommentPage.of(context)!.loadComments();
+    await MessagesPage.of(context)!.loadComments();
 
     setState(() {
-      _textCommentController.text = '';
-      sending = false;
+      _inputMessageController.text = '';
+      _sending = false;
     });
   }
 
-  /// Check is input empty
-  bool isEmpty() => _textCommentController.text.isEmpty;
+  bool _isInputEmpty() => _inputMessageController.text.isEmpty;
 
-  int maxLines() {
-    if (_textCommentController.value.text.length <= 36) return 1;
-    if ((_textCommentController.value.text.length / 40 + 1).round() >= 5) return 5;
-    return (_textCommentController.value.text.length / 40 + 1).round();
+  int _maxLines() {
+    if (_inputMessageController.value.text.length <= 36) return 1;
+    if ((_inputMessageController.value.text.length / 40 + 1).round() >= 5) return 5;
+    return (_inputMessageController.value.text.length / 40 + 1).round();
   }
 
   @override
@@ -72,11 +67,11 @@ class AddCommentState extends State<AddComment> {
                   ),
                   child: CupertinoTextField(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    minLines: maxLines(),
+                    minLines: _maxLines(),
                     maxLines: 5,
                     placeholder: 'Message',
                     onChanged: (_) => setState(() {}),
-                    controller: _textCommentController,
+                    controller: _inputMessageController,
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.transparent),
                       borderRadius: const BorderRadius.all(Radius.circular(20)),
@@ -89,13 +84,13 @@ class AddCommentState extends State<AddComment> {
                 padding: const EdgeInsets.symmetric(vertical: 5),
                 child: ClipOval(
                   child: Material(
-                    color: isEmpty() ? Colors.lightGreen.withOpacity(.5) : Colors.lightGreen,
+                    color: _isInputEmpty() ? Colors.lightGreen.withOpacity(.5) : Colors.lightGreen,
                     child: InkWell(
-                      onTap: () => isEmpty() || sending ? null : addComment(),
+                      onTap: () => _isInputEmpty() || _sending ? null : _onPressSent(),
                       child: SizedBox(
                         width: 30,
                         height: 30,
-                        child: sending
+                        child: _sending
                             ? const CupertinoActivityIndicator()
                             : const Icon(CupertinoIcons.arrow_up, size: 20, color: Colors.white),
                       ),

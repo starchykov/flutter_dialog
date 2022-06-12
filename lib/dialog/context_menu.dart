@@ -7,7 +7,7 @@ import 'package:flutter_dialog/constants/constants.dart';
 import 'package:flutter_dialog/models/message_model.dart';
 
 import 'message_actions.dart';
-import 'message_item.dart';
+import 'messages_item.dart';
 
 class ContextMenu extends StatefulWidget {
   final GlobalKey globalKey;
@@ -27,49 +27,53 @@ class ContextMenu extends StatefulWidget {
 
   @override
   State<ContextMenu> createState() => ContextMenuState();
-  static ContextMenuState? of(BuildContext context) => context.findAncestorStateOfType<ContextMenuState>();
 }
 
 class ContextMenuState extends State<ContextMenu> {
-  late RenderBox renderBox;
-  late Offset offset;
-  late double offsetY;
-
-  late Size screen;
-
+  late Size _screen;
+  late RenderBox _renderBox;
+  late Offset _offset;
   late bool _isFloatingOpen;
   late List<MenuActions> _availableActions;
 
   @override
   void initState() {
+    WidgetsBinding.instance.addPostFrameCallback(_afterLayout);
     super.initState();
   }
+
+  bool _isKeyboardVisible() => MediaQuery.of(context).viewInsets.bottom != 0;
+
+  void _afterLayout(dynamic _) => _configureContextMenu();
 
   void _configureContextMenu() {
     _isFloatingOpen = false;
     _availableActions = [MenuActions.copy, MenuActions.delete];
-    screen = MediaQuery.of(context).size;
+    _screen = MediaQuery.of(context).size;
 
     if (widget.message.isPending == 0) _availableActions.add(MenuActions.copy);
     if (widget.message.isPending == 0) _availableActions.add(MenuActions.delete);
     if (widget.message.isPending == 2) _availableActions.add(MenuActions.resent);
+
+    setState(() => _renderBox = widget.globalKey.currentContext?.findRenderObject() as RenderBox);
+  }
+
+  double _calcMenuOffset() {
     int count = _availableActions.length;
 
-    setState(() {
-      renderBox = widget.globalKey.currentContext?.findRenderObject() as RenderBox;
-      final double messageHeight = renderBox.size.height;
+    /// Calculate message position
+    _offset = _renderBox.localToGlobal(Offset.zero);
+    final double offsetY;
+    final double messageHeight = _renderBox.size.height;
+    final bool lastItem = _offset.dy > (_screen.height - messageHeight - 100) || _isKeyboardVisible();
 
-      /// Calculate message position
-      offset = renderBox.localToGlobal(Offset.zero);
-      final bool lastItem = offset.dy > (screen.height - messageHeight - 100);
-
-      /// Wrapper margin/padding(50) + (acton height * item count) + (divider height * item count)
-      offsetY = lastItem ? (offset.dy - (50 + (30 * count) + (11 * (count - 1)))) : (offset.dy - 20);
-    });
+    /// Wrapper margin/padding(50) + (acton height * item count) + (divider height * item count)
+    offsetY = lastItem ? (_offset.dy - (50 + (30 * count) + (11 * (count - 1)))) : (_offset.dy - 20);
+    return offsetY;
   }
 
   /// Copy note to clipboard
-  Future _copyNote({required int index}) async {
+  Future _copyMessage({required int index}) async {
     log('Copy action', name: runtimeType.toString());
     HapticFeedback.heavyImpact();
     await Clipboard.setData(ClipboardData(text: widget.message.message));
@@ -77,7 +81,7 @@ class ContextMenuState extends State<ContextMenu> {
   }
 
   /// Copy note to clipboard
-  Future _deleteNote({required int index}) async {
+  Future _deleteMessage({required int index}) async {
     log('Delete action', name: runtimeType.toString());
     HapticFeedback.heavyImpact();
     widget.onClose();
@@ -95,20 +99,20 @@ class ContextMenuState extends State<ContextMenu> {
         Positioned(
           left: widget.current ? 0 : 10,
           right: widget.current ? 10 : 0,
-          top: offsetY,
+          top: _calcMenuOffset(),
           child: Column(
             textDirection: widget.current ? TextDirection.ltr : TextDirection.ltr,
             crossAxisAlignment: widget.current ? CrossAxisAlignment.end : CrossAxisAlignment.start,
             children: [
               Visibility(
-                visible: offset.dy > screen.height - (renderBox.size.height + 100),
+                visible: _offset.dy > _screen.height - (_renderBox.size.height + 100) || _isKeyboardVisible(),
                 child: MessageActions(
                   index: widget.index,
                   current: widget.current,
-                  onCopy: ({required int index}) async => await _copyNote(index: index),
-                  onDelete: ({required int index}) async => await _deleteNote(index: index),
+                  onCopy: ({required int index}) async => await _copyMessage(index: index),
+                  onDelete: ({required int index}) async => await _deleteMessage(index: index),
                   onResent: widget.message.isPending == 2
-                      ? ({required int index}) async => await _deleteNote(index: index)
+                      ? ({required int index}) async => await _deleteMessage(index: index)
                       : null,
                 ),
               ),
@@ -118,12 +122,15 @@ class ContextMenuState extends State<ContextMenu> {
                 messageItem: widget.message,
               ),
               Visibility(
-                visible: !(offset.dy > screen.height - (renderBox.size.height + 100)),
+                visible: !(_offset.dy > _screen.height - (_renderBox.size.height + 100)) && !_isKeyboardVisible(),
                 child: MessageActions(
                   index: widget.index,
                   current: widget.current,
-                  onCopy: ({required int index}) async => await _copyNote(index: index),
-                  onDelete: ({required int index}) async => await _deleteNote(index: index),
+                  onCopy: ({required int index}) async => await _copyMessage(index: index),
+                  onDelete: ({required int index}) async => await _deleteMessage(index: index),
+                  onResent: widget.message.isPending == 2
+                      ? ({required int index}) async => await _deleteMessage(index: index)
+                      : null,
                 ),
               ),
             ],

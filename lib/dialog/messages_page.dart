@@ -5,118 +5,101 @@ import 'package:flutter_dialog/models/message_model.dart';
 
 import 'messages_list.dart';
 
-class CommentPage extends StatefulWidget {
-  const CommentPage({Key? key}) : super(key: key);
+class MessagesPage extends StatefulWidget {
+  const MessagesPage({Key? key}) : super(key: key);
 
   @override
-  State<CommentPage> createState() => CommentPageState();
+  State<MessagesPage> createState() => MessagesPageState();
 
-  static CommentPageState? of(BuildContext context) => context.findAncestorStateOfType<CommentPageState>();
+  static MessagesPageState? of(BuildContext context) => context.findAncestorStateOfType<MessagesPageState>();
 }
 
-class CommentPageState extends State<CommentPage> {
-  //final CommentController api = CommentController();
-  final GlobalKey<ScaffoldMessengerState> msgKey = GlobalKey<ScaffoldMessengerState>();
-  List<Message> commentList = [];
+class MessagesPageState extends State<MessagesPage> {
+  final GlobalKey<ScaffoldMessengerState> messagesPageKey = GlobalKey<ScaffoldMessengerState>();
+  List<Message> _messages = <Message>[];
   late Future<List<Message>> _future;
   final ScrollController _controller = ScrollController();
-
-  /// Define loading flag
-  bool loading = true;
+  bool _loading = true;
 
   @override
   void initState() {
-    loadCommentsFromDB();
+    _loadMessages();
     super.initState();
   }
 
   Future loadComments() async {
-    setState(() => loading = true);
-
-    /// Get request to server, save response data to database
-    //await api.getDataFromRequest(globalCaseId);
-
-    /// Get list of DocumentModel from database
-    await loadCommentsFromDB();
-
-    /// Show message after update
-    //String statStr = api.getStatisticString(context);
-    //msgKey.currentState.showSnackBar(CustomSnackBar().UploadInfoSnackBar(statStr, msgKey.currentContext));
+    setState(() => _loading = true);
+    await _loadMessages();
   }
 
-  Future<List<Message>> loadCommentsFromDB() async {
-    /// Get list of DocumentModel from database
-    // List<dynamic> dataDB = await api.getDataFromDB(globalCaseId);
-    ///List<Message> list = new List<Message>.from(dataDB.whereType<Message>());
-
+  Future<List<Message>> _loadMessages() async {
     List<Message> list = [
-      const Message('John', 'This is not sent message with long text: text text text text text text text text', 2, '15.05.2022'),
+      const Message(
+          'John', 'This is not sent message with long text: text text text text text text text text', 2, '15.05.2022'),
       const Message('Olexei', 'Hello Hello Hello Hello!', 0, '15.05.2022'),
-      const Message('John', 'This is long text message: text text text text text text text text text text text', 1, '15.05.2022'),
+      const Message(
+          'John', 'This is long text message: text text text text text text text text text text text', 1, '15.05.2022'),
       const Message('John', 'This is example of the Flutter dialog!', 0, '15.05.2022'),
       const Message('John', 'Hello! ', 1, '15.05.2022'),
     ];
 
     /// Set actual data from database to state. Let loading flag to false
     setState(() {
-      commentList = list;
-      loading = false;
+      _messages = list;
+      _loading = false;
     });
     return _future = Future.value(list);
   }
 
-  /// Check availability of the Internet connection
-  Future<void> createComment() async {
-    //String msg = 'No Internet';
-    //ApplicationUser.user.isOfflineMode
-    //     ? msgKey.currentState.showSnackBar(CustomSnackBar().UploadErrorSnackBar(msg, msgKey.currentContext))
-    //     : await loadComments();
-  }
-
   @override
-  Widget build(BuildContext context) => ScaffoldMessenger(
-        key: msgKey,
-        child: CupertinoPageScaffold(
-          child: FutureBuilder(
-            future: _future,
-            builder: (context, snapshot) => Stack(
-              children: [
-                Column(
-                  children: [
-                    Expanded(child: CommentsList(comments: commentList, controller: _controller)),
-                    const AddComment()
-                  ],
-                ),
-                if (loading)
-                  Align(
-                    alignment: Alignment.topCenter,
-                    child: Container(
-                      height: 30,
-                      width: MediaQuery.of(context).size.width * .5,
-                      margin: const EdgeInsets.all(10),
-                      padding: const EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        borderRadius: const BorderRadius.only(
-                          bottomLeft: Radius.circular(20),
-                          bottomRight: Radius.circular(20),
-                          topLeft: Radius.circular(20),
-                          topRight: Radius.circular(20),
+  Widget build(BuildContext context) => GestureDetector(
+    onTap: () => FocusScope.of(context).unfocus(),
+    child: ScaffoldMessenger(
+          key: messagesPageKey,
+          child: CupertinoPageScaffold(
+            child: FutureBuilder(
+              future: _future,
+              builder: (context, snapshot) => Stack(
+                children: [
+                  Column(
+                    children: [
+                      Expanded(child: MessagesList(messages: _messages, controller: _controller)),
+                      const MessagesInput()
+                    ],
+                  ),
+                  Visibility(
+                    visible: _loading,
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: Container(
+                        height: 30,
+                        width: MediaQuery.of(context).size.width * .5,
+                        margin: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: const BorderRadius.only(
+                            bottomLeft: Radius.circular(20),
+                            bottomRight: Radius.circular(20),
+                            topLeft: Radius.circular(20),
+                            topRight: Radius.circular(20),
+                          ),
                         ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          CupertinoActivityIndicator(color: Colors.grey[500]),
-                          const SizedBox(width: 15),
-                          Text('Loading', style: TextStyle(color: Colors.grey[500])),
-                        ],
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CupertinoActivityIndicator(color: Colors.grey[500]),
+                            const SizedBox(width: 15),
+                            Text('Loading', style: TextStyle(color: Colors.grey[500])),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
-      );
+  );
 }

@@ -38,8 +38,8 @@ class ContextMenuState extends State<ContextMenu> {
 
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback(_afterLayout);
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback(_afterLayout);
   }
 
   bool _isKeyboardVisible() => MediaQuery.of(context).viewInsets.bottom != 0;

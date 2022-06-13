@@ -5,36 +5,47 @@ import 'package:flutter_dialog/constants/constants.dart';
 import 'package:flutter_dialog/dialog/context_menu.dart';
 import 'package:flutter_dialog/dialog/messages_item.dart';
 import 'package:flutter_dialog/dialog/messages_page.dart';
+import 'package:flutter_dialog/dialog/messages_inherit.dart';
 import 'package:flutter_dialog/models/message_model.dart';
 
 class MessagesList extends StatefulWidget {
-  final List<Message> messages;
-  final ScrollController controller;
-
-  const MessagesList({Key? key, required this.messages, required this.controller}) : super(key: key);
+  const MessagesList({Key? key}) : super(key: key);
 
   @override
   State<MessagesList> createState() => MessagesListState();
-
-  static MessagesListState? of(BuildContext context) => context.findAncestorStateOfType<MessagesListState>();
 }
 
 class MessagesListState extends State<MessagesList> {
-  bool _isContextMenuOpen = false;
-  late ScrollController scroll;
+  late List<Message> _messages;
+  late bool _isContextMenuOpen;
+  late ScrollController _scroll;
   late OverlayEntry _contextMenu;
 
   @override
   void initState() {
-    widget.controller.addListener((_scrollListener));
-    scroll = widget.controller;
     super.initState();
+    _isContextMenuOpen = false;
+    _scroll = ScrollController();
+    _scroll.addListener((_scrollListener));
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _messages = context.dependOnInheritedWidgetOfExactType<DataMessageProvider>(aspect: 'messages')?.messages ?? [];
+  }
+
+  T? getInherit<T>(BuildContext context) {
+    final element = context.getElementForInheritedWidgetOfExactType<DataMessageProvider>();
+    final inheritWidget = element?.widget;
+    if (inheritWidget is T) return inheritWidget as T;
+    return null;
   }
 
   Future _scrollListener() async {
-    if (scroll.offset >= scroll.position.maxScrollExtent && !widget.controller.position.outOfRange) {}
-    if (scroll.offset <= scroll.position.minScrollExtent && !scroll.position.outOfRange) {
-      await MessagesPage.of(context)?.loadComments();
+    if (_scroll.offset >= _scroll.position.maxScrollExtent && !_scroll.position.outOfRange) {}
+    if (_scroll.offset <= _scroll.position.minScrollExtent && !_scroll.position.outOfRange) {
+      await MessagesPage.of(context)?.loadFromAPI();
     }
   }
 
@@ -64,7 +75,7 @@ class MessagesListState extends State<MessagesList> {
           globalKey: key,
           index: index,
           current: current,
-          message: widget.messages[index],
+          message: _messages[index],
           onClose: _closeContextMenu,
         ),
       ),
@@ -74,23 +85,23 @@ class MessagesListState extends State<MessagesList> {
   @override
   Widget build(BuildContext context) {
     bool currentUser(String user) => 'John' == user;
-    if (widget.messages.isEmpty) return const NoDataToDisplay(text: 'No data', top: 60);
+    if (_messages.isEmpty) return const NoDataToDisplay(text: 'No data', top: 60);
     return SizedBox(
       height: MediaQuery.of(context).size.height,
       child: ListView.builder(
         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-        controller: widget.controller,
+        controller: _scroll,
         reverse: true,
         physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-        itemCount: widget.messages.length,
+        itemCount: _messages.length,
         padding: const EdgeInsets.symmetric(vertical: kDefaultTextSpace, horizontal: 10),
         itemBuilder: (context, index) {
-          bool isCurrent = currentUser(widget.messages[index].userName);
+          bool isCurrent = currentUser(_messages[index].userName);
           return MessageItem(
             isOpen: _isContextMenuOpen,
-            isCurrent: currentUser(widget.messages[index].userName),
+            isCurrent: currentUser(_messages[index].userName),
             onPress: ({required GlobalKey key}) => _showContextMenu(key: key, current: isCurrent, index: index),
-            messageItem: widget.messages[index],
+            messageItem: _messages[index],
           );
         },
       ),

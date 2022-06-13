@@ -1,6 +1,9 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_dialog/dialog/messages_input.dart';
+import 'package:flutter_dialog/dialog/messages_inherit.dart';
+import 'package:flutter_dialog/dialog/messages_loading.dart';
 import 'package:flutter_dialog/models/message_model.dart';
 
 import 'messages_list.dart';
@@ -15,91 +18,60 @@ class MessagesPage extends StatefulWidget {
 }
 
 class MessagesPageState extends State<MessagesPage> {
-  final GlobalKey<ScaffoldMessengerState> messagesPageKey = GlobalKey<ScaffoldMessengerState>();
-  List<Message> _messages = <Message>[];
-  late Future<List<Message>> _future;
-  final ScrollController _controller = ScrollController();
+  List<Message> messages = <Message>[];
   bool _loading = true;
+  int number = 1;
+
+  /// Test data
+  List<Message> testDataList = [
+    const Message('John', 'This is not sent message with long text: text text text text text text', 2, '15.05.2022'),
+    const Message('Olexei', 'Hello Hello Hello Hello!', 0, '15.05.2022'),
+    const Message('John', 'This is long text message: text text text text text text text text text', 1, '15.05.2022'),
+    const Message('John', 'This is example of the Flutter dialog!', 0, '15.05.2022'),
+    const Message('John', 'Hello! ', 1, '15.05.2022'),
+  ];
 
   @override
   void initState() {
-    _loadMessages();
     super.initState();
+    _loadMessages();
   }
 
-  Future loadComments() async {
+  Future loadFromAPI() async {
+    log('Loading from API', name: 'Message page');
     setState(() => _loading = true);
     await _loadMessages();
   }
 
   Future<List<Message>> _loadMessages() async {
-    List<Message> list = [
-      const Message(
-          'John', 'This is not sent message with long text: text text text text text text text text', 2, '15.05.2022'),
-      const Message('Olexei', 'Hello Hello Hello Hello!', 0, '15.05.2022'),
-      const Message(
-          'John', 'This is long text message: text text text text text text text text text text text', 1, '15.05.2022'),
-      const Message('John', 'This is example of the Flutter dialog!', 0, '15.05.2022'),
-      const Message('John', 'Hello! ', 1, '15.05.2022'),
-    ];
+    log('Loading from database', name: 'Message page');
 
-    /// Set actual data from database to state. Let loading flag to false
     setState(() {
-      _messages = list;
+      messages = testDataList;
       _loading = false;
     });
-    return _future = Future.value(list);
+    return Future.value(testDataList);
   }
 
   @override
   Widget build(BuildContext context) => GestureDetector(
-    onTap: () => FocusScope.of(context).unfocus(),
-    child: ScaffoldMessenger(
-          key: messagesPageKey,
-          child: CupertinoPageScaffold(
-            child: FutureBuilder(
-              future: _future,
-              builder: (context, snapshot) => Stack(
-                children: [
-                  Column(
-                    children: [
-                      Expanded(child: MessagesList(messages: _messages, controller: _controller)),
-                      const MessagesInput()
-                    ],
-                  ),
-                  Visibility(
-                    visible: _loading,
-                    child: Align(
-                      alignment: Alignment.topCenter,
-                      child: Container(
-                        height: 30,
-                        width: MediaQuery.of(context).size.width * .5,
-                        margin: const EdgeInsets.all(10),
-                        padding: const EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[300],
-                          borderRadius: const BorderRadius.only(
-                            bottomLeft: Radius.circular(20),
-                            bottomRight: Radius.circular(20),
-                            topLeft: Radius.circular(20),
-                            topRight: Radius.circular(20),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            CupertinoActivityIndicator(color: Colors.grey[500]),
-                            const SizedBox(width: 15),
-                            Text('Loading', style: TextStyle(color: Colors.grey[500])),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: CupertinoPageScaffold(
+          child: DataMessageProvider(
+            loading: _loading,
+            messages: [...messages],
+            child: Stack(
+              children: [
+                Column(
+                  children: const [
+                    Expanded(child: MessagesList()),
+                    MessagesInput(),
+                  ],
+                ),
+                const MessageLoading(),
+              ],
             ),
           ),
         ),
-  );
+      );
 }

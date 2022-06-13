@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dialog/models/message_model.dart';
 
 import 'messages_page.dart';
 
@@ -29,9 +30,9 @@ class MessagesInputState extends State<MessagesInput> {
   Future _sendMessage() async {
     setState(() => _sending = true);
     _addFormKey.currentState!.reset();
-    //Message commentModel = Message('Ivan', _textCommentController.text, 0, DateTime.now().toString());
-    //await _commentController.createComment(commentModel);
-    await MessagesPage.of(context)!.loadComments();
+
+    MessagesPage.of(context)?.testDataList.insert(0, Message('John', _inputMessageController.text, 2, '16.05.2022'));
+    await MessagesPage.of(context)!.loadFromAPI();
 
     setState(() {
       _inputMessageController.text = '';

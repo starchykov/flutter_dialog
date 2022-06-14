@@ -34,10 +34,8 @@ class MessagesInputState extends State<MessagesInput> {
     MessagesPage.of(context)?.testDataList.insert(0, Message('John', _inputMessageController.text, 2, '16.05.2022'));
     await MessagesPage.of(context)!.loadFromAPI();
 
-    setState(() {
-      _inputMessageController.text = '';
-      _sending = false;
-    });
+    setState(() => _sending = false);
+    _inputMessageController.clear();
   }
 
   bool _isInputEmpty() => _inputMessageController.text.isEmpty;

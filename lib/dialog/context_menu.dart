@@ -44,7 +44,7 @@ class ContextMenuState extends State<ContextMenu> {
 
   bool _isKeyboardVisible() => MediaQuery.of(context).viewInsets.bottom != 0;
 
-  void _afterLayout(dynamic _) => _configureContextMenu();
+  void _afterLayout(Duration duration) => _configureContextMenu();
 
   void _configureContextMenu() {
     _isFloatingOpen = false;

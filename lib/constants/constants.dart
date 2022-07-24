@@ -13,7 +13,7 @@ enum PendingStatus {
   sent,
 }
 
-const kBackgroundGray = Color(0xFF366CF6);
+const kBackgroundBlue = Color(0xFF2C87F6);
 const kPrimaryColor = Color(0xFF366CF6);
 const kSecondaryColor = Color(0xFFF5F6FC);
 const kBgLightColor = Color(0xFFF2F4FC);
@@ -27,7 +27,7 @@ const kTextColor = Color(0xFF4D5875);
 
 const kDefaultFontSize = 14.0;
 
-const kDefaultBoxPadding = 15.0;
+const kDefaultBoxPadding = 16.0;
 const kDefaultBoxMargin = 10.0;
 const kDefaultTextSpace = 5.0;
 const kDefaultBorderRadius = 20.0;

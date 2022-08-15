@@ -31,7 +31,11 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) => const CupertinoPageScaffold(
         backgroundColor: CupertinoColors.lightBackgroundGray,
-        navigationBar: CupertinoNavigationBar(middle: Text('Messages')),
+        navigationBar: CupertinoNavigationBar(
+          automaticallyImplyLeading: true,
+          previousPageTitle: 'Dialogs',
+          middle: Text('Messages'),
+        ),
         child: SafeArea(child: MessagesPage()),
       );
 }

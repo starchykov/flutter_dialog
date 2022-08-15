@@ -28,6 +28,7 @@ linter:
   # producing the lint.
   rules:
     prefer_single_quotes: true
+    avoid_init_to_null: true
     prefer_const_constructors: true
     prefer_const_declarations: true
     avoid_print: true

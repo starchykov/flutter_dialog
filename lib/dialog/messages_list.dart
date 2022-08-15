@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dialog/common/no_data_display.dart';
 import 'package:flutter_dialog/constants/constants.dart';
 import 'package:flutter_dialog/dialog/context_menu.dart';
@@ -57,38 +58,52 @@ class MessagesListState extends State<MessagesList> {
         padding: const EdgeInsets.symmetric(vertical: kDefaultTextSpace, horizontal: 10),
         itemBuilder: (context, index) {
           bool isCurrent = currentUser(_messages[index].userName);
-          return Row(
-            mainAxisAlignment: isCurrent ? MainAxisAlignment.end : MainAxisAlignment.start,
-            children: [
-              ContextMenu(
-                menuActionHeight: 45.0,
-                menuWidth: MediaQuery.of(context).size.width * .45,
-                menuOffset: 5.0,
-                actions: [
-                  if (_messages[index].isPending == 2)
+          return GestureDetector(
+            onHorizontalDragUpdate: (DragUpdateDetails details) {
+              // Note: Sensitivity is integer used when you don't want to mess up vertical drag
+              int sensitivity = 50;
+              if (details.delta.dx > sensitivity) {
+                // Right Swipe
+                HapticFeedback.heavyImpact();
+              } else if(details.delta.dx < -sensitivity) {
+                //Left Swipe
+                HapticFeedback.heavyImpact();
+                print(details);
+              }
+            },
+            child: Row(
+              mainAxisAlignment: isCurrent ? MainAxisAlignment.end : MainAxisAlignment.start,
+              children: [
+                ContextMenu(
+                  menuActionHeight: 45.0,
+                  menuWidth: MediaQuery.of(context).size.width * .45,
+                  menuOffset: 5.0,
+                  actions: [
+                    if (_messages[index].isPending == 2)
+                      ContextMenuAction(
+                        icon: const Icon(CupertinoIcons.arrow_up_circle, color: Colors.black54, size: 20),
+                        title: const Text('Resent'),
+                        onPress: () {},
+                      ),
                     ContextMenuAction(
-                      icon: const Icon(CupertinoIcons.arrow_up_circle, color: Colors.black54, size: 20),
-                      title: const Text('Resent'),
+                      icon: const Icon(CupertinoIcons.doc_on_clipboard, color: Colors.black54, size: 20),
+                      title: const Text('Copy'),
                       onPress: () {},
                     ),
-                  ContextMenuAction(
-                    icon: const Icon(CupertinoIcons.doc_on_clipboard, color: Colors.black54, size: 20),
-                    title: const Text('Copy'),
-                    onPress: () {},
+                    ContextMenuAction(
+                      icon: const Icon(CupertinoIcons.delete, color: Colors.redAccent, size: 20),
+                      title: const Text('Delete'),
+                      onPress: () {},
+                    ),
+                  ],
+                  child: MessageItem(
+                    isOpen: _isContextMenuOpen,
+                    isCurrent: isCurrent,
+                    messageItem: _messages[index],
                   ),
-                  ContextMenuAction(
-                    icon: const Icon(CupertinoIcons.delete, color: Colors.redAccent, size: 20),
-                    title: const Text('Delete'),
-                    onPress: () {},
-                  ),
-                ],
-                child: MessageItem(
-                  isOpen: _isContextMenuOpen,
-                  isCurrent: isCurrent,
-                  messageItem: _messages[index],
                 ),
-              ),
-            ],
+              ],
+            ),
           );
         },
       ),

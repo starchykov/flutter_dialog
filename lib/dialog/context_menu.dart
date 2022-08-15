@@ -60,6 +60,7 @@ class ContextMenu extends StatefulWidget {
   final double? menuActionHeight;
   final double? bottomOffsetHeight;
   final double? menuOffset;
+
   final double? menuWidth;
   final bool showByTap;
 

@@ -5,8 +5,8 @@ Implementation of Flutter dialog.
 Overview:
 
 
-<img alt="img.png" src="https://github.com/starchykov/flutter_dialog/blob/main/assets/screenshot_1.png" width="400"/>
-<img alt="img.png" src="https://github.com/starchykov/flutter_dialog/blob/main/assets/screenshot_2.png" width="400"/>
+<img alt="img.png" src="https://github.com/starchykov/flutter_dialog/blob/main/assets/screenshot_1.png" width="300"/>
+<img alt="img.png" src="https://github.com/starchykov/flutter_dialog/blob/main/assets/screenshot_2.png" width="300"/>
 
 ## Getting Started
 

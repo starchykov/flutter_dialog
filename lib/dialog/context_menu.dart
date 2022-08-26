@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -7,30 +8,36 @@ class ContextMenuAction {
   /// Menu action title widget.
   ///
   /// Example: const Text('Copy')
-  final Widget title;
+  final String title;
+
+  /// Trailing icon.
+  ///
+  /// Example: const Icon(CupertinoIcons.doc_on_clipboard)
+  final IconData? icon;
 
   /// Menu action callback function.
   ///
   /// Example: Function _func(param: val)
   final Function onPress;
 
-  /// Trailing icon.
-  ///
-  /// Example: const Icon(CupertinoIcons.doc_on_clipboard)
-  final Icon? icon;
-
   /// Menu widget background color.
   ///
   /// Example: const Colors.white
   final Color? backgroundColor;
 
+  /// Menu widget background color.
+  ///
+  /// Example: const Colors.white
+  final bool? negativeAction;
+
   /// The menu that displays when ContextMenu is open. It consists of a
   /// list of actions.
   const ContextMenuAction({
     required this.title,
-    required this.onPress,
     this.icon,
+    required this.onPress,
     this.backgroundColor,
+    this.negativeAction,
   });
 }
 
@@ -58,10 +65,37 @@ class ContextMenu extends StatefulWidget {
   ///
   /// Default [ContextMenuAction]s height is 50.0
   final double? menuActionHeight;
-  final double? bottomOffsetHeight;
+
+
+  /// [ContextMenu] child widget indent can be configured.
+  ///
+  /// Default [ContextMenuAction]s indent is 0
+  final double? childOffset;
+
+  /// All side[ContextMenu] indent can be configured.
+  ///
+  /// Default [ContextMenuAction]s indent is 0
   final double? menuOffset;
 
+  /// Top [ContextMenu] indent can be configured.
+  ///
+  /// Default [ContextMenuAction]s indent is 0
+  final double? bottomOffsetHeight;
+
+  /// [ContextMenu] width.
+  ///
+  /// Default [ContextMenu] width is equal to child widget width
   final double? menuWidth;
+
+  /// [ContextMenu] border radius.
+  ///
+  /// Default [ContextMenu]s border radius is 20
+  final double? borderRadius;
+
+  /// [ContextMenu] can be opened by tap if [showByTap] is true.
+  /// By default it's opened by long press.
+  ///
+  /// Default [showByTap] value is false
   final bool showByTap;
 
   const ContextMenu({
@@ -70,8 +104,10 @@ class ContextMenu extends StatefulWidget {
     required this.actions,
     this.menuActionHeight,
     this.menuWidth,
-    this.bottomOffsetHeight,
+    this.borderRadius,
+    this.childOffset,
     this.menuOffset,
+    this.bottomOffsetHeight,
     this.showByTap = false,
   }) : super(key: key);
 
@@ -106,21 +142,6 @@ class ContextMenuState extends State<ContextMenu> {
     });
   }
 
-  /// Copy note to clipboard
-  // Future _copyMessage({required int index}) async {
-  //   log('Copy action', name: runtimeType.toString());
-  //   HapticFeedback.heavyImpact();
-  //   // await Clipboard.setData(ClipboardData(text: widget.message.message));
-  //   widget.onClose();
-  // }
-
-  /// Copy note to clipboard
-  // Future _deleteMessage({required int index}) async {
-  //   log('Delete action', name: runtimeType.toString());
-  //   HapticFeedback.heavyImpact();
-  //   widget.onClose();
-  // }
-
   OverlayEntry _createContextMenu() => OverlayEntry(
         builder: (context) => GestureDetector(
           behavior: HitTestBehavior.translucent,
@@ -131,6 +152,7 @@ class ContextMenuState extends State<ContextMenu> {
             childSize: childSize,
             menuWidth: widget.menuWidth,
             bottomOffsetHeight: widget.bottomOffsetHeight ?? 0,
+            borderRadius: widget.borderRadius ?? 20,
             menuOffset: widget.menuOffset ?? 0,
             menuActionHeight: widget.menuActionHeight,
             onPress: _closeContextMenu,
@@ -172,6 +194,7 @@ class _ContextMenu extends StatelessWidget {
   final Offset childOffset;
   final double? menuActionHeight;
   final double? menuWidth;
+  final double borderRadius;
   final double bottomOffsetHeight;
   final double menuOffset;
   final Function onPress;
@@ -184,6 +207,7 @@ class _ContextMenu extends StatelessWidget {
     required this.actions,
     this.menuActionHeight,
     this.menuWidth,
+    required this.borderRadius,
     required this.bottomOffsetHeight,
     required this.menuOffset,
     required this.onPress,
@@ -198,19 +222,19 @@ class _ContextMenu extends StatelessWidget {
     final maxMenuHeight = size.height * 0.45;
     final listHeight = actions.length * (menuActionHeight ?? 50.0);
 
-    final maxMenuWidth = menuWidth ?? (size.width * 0.4);
+    final maxMenuWidth = menuWidth ?? (childSize.width >= size.width * 0.4 ? childSize.width : size.width);
     final menuHeight = listHeight < maxMenuHeight ? listHeight : maxMenuHeight;
 
-    // final leftOffset = (childOffset.dx + maxMenuWidth) < size.width
-    //     ? childOffset.dx
-    //     : (childOffset.dx - maxMenuWidth + childSize.width);
+    final leftOffset = (childOffset.dx + maxMenuWidth) < size.width
+        ? childOffset.dx + menuOffset
+        : (childOffset.dx - maxMenuWidth + childSize.width - menuOffset);
 
     final actionsOffset = childOffset.dy + menuHeight + childSize.height;
     final screenSize = size.height - bottomOffsetHeight - keyboardHeight;
 
     final topOffset = actionsOffset < screenSize
-        ? childOffset.dy + childSize.height + menuOffset
-        : childOffset.dy - menuHeight - menuOffset;
+        ? childOffset.dy + childSize.height + bottomOffsetHeight
+        : childOffset.dy - menuHeight - bottomOffsetHeight;
 
     return Stack(
       children: [
@@ -220,20 +244,20 @@ class _ContextMenu extends StatelessWidget {
         ),
         Positioned(
           top: topOffset,
-          left: childOffset.dx,
+          left: leftOffset,
           child: Container(
             clipBehavior: Clip.antiAlias,
             width: maxMenuWidth,
             height: menuHeight,
             decoration: BoxDecoration(
               color: Colors.grey.shade200,
-              borderRadius: const BorderRadius.all(Radius.circular(20.0)),
+              borderRadius: BorderRadius.all(Radius.circular(borderRadius)),
               boxShadow: const [BoxShadow(color: Colors.black38, blurRadius: 10, spreadRadius: 1)],
             ),
             child: ListView.builder(
               itemCount: actions.length,
               padding: EdgeInsets.zero,
-              physics: const BouncingScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               itemBuilder: (context, index) => GestureDetector(
                 onTap: () {
                   onPress();
@@ -248,10 +272,24 @@ class _ContextMenu extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      actions[index].title,
+                      Text(
+                        actions[index].title,
+                        style: Theme.of(context).textTheme.subtitle1?.merge(
+                              TextStyle(
+                                color: actions[index].negativeAction ?? false
+                                    ? CupertinoColors.destructiveRed
+                                    : Theme.of(context).textTheme.subtitle1?.color,
+                              ),
+                            ),
+                      ),
                       Visibility(
                         visible: actions[index].icon != null,
-                        child: actions[index].icon!,
+                        child: Icon(
+                          actions[index].icon,
+                          color: actions[index].negativeAction ?? false
+                              ? CupertinoColors.destructiveRed
+                              : Theme.of(context).primaryColor,
+                        ),
                       )
                     ],
                   ),

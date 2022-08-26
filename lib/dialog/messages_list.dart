@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dialog/common/no_data_display.dart';
 import 'package:flutter_dialog/constants/constants.dart';
@@ -68,7 +67,6 @@ class MessagesListState extends State<MessagesList> {
               } else if(details.delta.dx < -sensitivity) {
                 //Left Swipe
                 HapticFeedback.heavyImpact();
-                print(details);
               }
             },
             child: Row(
@@ -81,18 +79,19 @@ class MessagesListState extends State<MessagesList> {
                   actions: [
                     if (_messages[index].isPending == 2)
                       ContextMenuAction(
-                        icon: const Icon(CupertinoIcons.arrow_up_circle, color: Colors.black54, size: 20),
-                        title: const Text('Resent'),
+                        icon: CupertinoIcons.arrow_up_circle,
+                        title: 'Resent',
                         onPress: () {},
                       ),
                     ContextMenuAction(
-                      icon: const Icon(CupertinoIcons.doc_on_clipboard, color: Colors.black54, size: 20),
-                      title: const Text('Copy'),
+                      icon: CupertinoIcons.doc_on_clipboard,
+                      title: 'Copy',
                       onPress: () {},
                     ),
                     ContextMenuAction(
-                      icon: const Icon(CupertinoIcons.delete, color: Colors.redAccent, size: 20),
-                      title: const Text('Delete'),
+                      icon: CupertinoIcons.delete,
+                      title: 'Delete',
+                      negativeAction: true,
                       onPress: () {},
                     ),
                   ],

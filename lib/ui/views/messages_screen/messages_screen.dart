@@ -19,6 +19,7 @@ class MessagesScreen extends StatelessWidget {
   Widget build(BuildContext context) => GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: SafeArea(
+          bottom: false,
           child: CupertinoPageScaffold(
             child: Stack(
               children: [

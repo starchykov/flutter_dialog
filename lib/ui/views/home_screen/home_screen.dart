@@ -6,7 +6,6 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>  CupertinoPageScaffold(
-        backgroundColor: CupertinoColors.lightBackgroundGray,
         navigationBar: const CupertinoNavigationBar(
           automaticallyImplyLeading: true,
           previousPageTitle: 'Dialogs',

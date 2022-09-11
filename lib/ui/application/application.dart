@@ -9,7 +9,10 @@ class DialogApp extends StatelessWidget {
     return const CupertinoApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
-      theme: CupertinoThemeData(primaryColor: CupertinoColors.systemBlue),
+      theme: CupertinoThemeData(
+        brightness: Brightness.light,
+        scaffoldBackgroundColor: CupertinoColors.systemBackground,
+      ),
       home: HomeScreen(),
     );
   }

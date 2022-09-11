@@ -16,7 +16,7 @@ class MessageLoading extends StatelessWidget {
         alignment: Alignment.topCenter,
         child: Container(
           height: 30,
-          width: MediaQuery.of(context).size.width * .5,
+          width: MediaQuery.of(context).size.width * .4,
           margin: const EdgeInsets.all(kDefaultBoxMargin),
           padding: const EdgeInsets.all(kDefaultTextSpace),
           decoration: const BoxDecoration(
@@ -30,10 +30,16 @@ class MessageLoading extends StatelessWidget {
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              CupertinoActivityIndicator(color: kDarkGrayColor, radius: 8),
-              SizedBox(width: kDefaultTextSpace),
-              Text('Loading', style: TextStyle(fontSize: kDefaultFontSize, color: kDarkGrayColor)),
+            children: [
+              const CupertinoActivityIndicator(radius: 8),
+              const SizedBox(width: kDefaultDoubleOffset),
+              Text(
+                'Loading',
+                style: TextStyle(
+                  fontSize: kDefaultFontSize,
+                  color: CupertinoTheme.of(context).textTheme.textStyle.color?.withOpacity(.5),
+                ),
+              ),
             ],
           ),
         ),

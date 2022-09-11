@@ -15,72 +15,76 @@ class MessagesInput extends StatelessWidget {
     MessagesScreenState state = context.select((MessagesScreenViewModel viewModel) => viewModel.state);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      color: CupertinoColors.lightBackgroundGray,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          GestureDetector(
-            onTap: () => state.messageText.isEmpty ? null : viewModel.sendMessage(),
-            child: const SizedBox(
-              width: 30,
-              height: 30,
-              child: const Icon(CupertinoIcons.paperclip, color: CupertinoColors.placeholderText),
-            ),
-          ),
-          const SizedBox(width: kDefaultTextSpace),
-          Expanded(
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.all(Radius.circular(20)),
-              ),
-              child: Stack(
-                children: [
-                  CupertinoTextField(
-                    padding: const EdgeInsets.only(left: 8, right: 28, top: 8, bottom: 8),
-                    minLines: viewModel.maxLines(),
-                    maxLines: 5,
-                    placeholder: 'Message',
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.transparent),
-                      borderRadius: const BorderRadius.all(Radius.circular(20)),
-                    ),
-                    onChanged: (messageText) => viewModel.onMessageInputPrint(messageText: messageText),
-                    controller: viewModel.inputMessageController,
-                  ),
-                  Positioned(
-                    bottom: 7,
-                    right: 8,
-                    child: GestureDetector(
-                      onTap: viewModel.showStickers,
-                      child: state.showStickers
-                          ? Icon(CupertinoIcons.keyboard, color: CupertinoColors.placeholderText)
-                          : Icon(CupertinoIcons.smiley, color: CupertinoColors.placeholderText),
-                    ),
-                  ),
-                ],
+      color: CupertinoColors.secondarySystemFill,
+      child: SafeArea(
+        top: false,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            GestureDetector(
+              onTap: () => state.messageText.isEmpty ? null : viewModel.sendMessage(),
+              child: const SizedBox(
+                width: 30,
+                height: 30,
+                child: Icon(CupertinoIcons.paperclip, color: CupertinoColors.placeholderText),
               ),
             ),
-          ),
-          const SizedBox(width: 8),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 5),
-            child: ClipOval(
+            const SizedBox(width: kDefaultTextSpace),
+            Expanded(
               child: Container(
-                color: viewModel.isInputEmpty ? CupertinoColors.systemBlue.withOpacity(.5) : CupertinoColors.systemBlue,
-                child: GestureDetector(
-                  onTap: () => state.messageText.isEmpty ? null : viewModel.sendMessage(),
-                  child: const SizedBox(
-                    width: 30,
-                    height: 30,
-                    child: Icon(CupertinoIcons.arrow_up, size: 20, color: CupertinoColors.white),
+                decoration: BoxDecoration(
+                  color: CupertinoTheme.of(context).barBackgroundColor,
+                  borderRadius: const BorderRadius.all(Radius.circular(20)),
+                ),
+                child: Stack(
+                  children: [
+                    CupertinoTextField(
+                      padding: const EdgeInsets.only(left: 8, right: 28, top: 8, bottom: 8),
+                      minLines: viewModel.maxLines(),
+                      maxLines: 5,
+                      placeholder: 'Message',
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.transparent),
+                        borderRadius: const BorderRadius.all(Radius.circular(20)),
+                      ),
+                      onChanged: (messageText) => viewModel.onMessageInputPrint(messageText: messageText),
+                      controller: viewModel.inputMessageController,
+                    ),
+                    Positioned(
+                      bottom: 7,
+                      right: 8,
+                      child: GestureDetector(
+                        onTap: viewModel.showStickers,
+                        child: state.showStickers
+                            ? const Icon(CupertinoIcons.keyboard, color: CupertinoColors.placeholderText)
+                            : const Icon(CupertinoIcons.smiley, color: CupertinoColors.placeholderText),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 5),
+              child: ClipOval(
+                child: Container(
+                  color:
+                      viewModel.isInputEmpty ? CupertinoColors.systemBlue.withOpacity(.5) : CupertinoColors.systemBlue,
+                  child: GestureDetector(
+                    onTap: () => state.messageText.isEmpty ? null : viewModel.sendMessage(),
+                    child: const SizedBox(
+                      width: 30,
+                      height: 30,
+                      child: Icon(CupertinoIcons.arrow_up, size: 20, color: CupertinoColors.white),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

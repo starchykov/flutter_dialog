@@ -21,7 +21,7 @@ class MessageItem extends StatelessWidget {
     return MaterialWrapper(
       borderTL: isCurrent ? 20 : 0,
       borderTR: isCurrent ? 0 : 20,
-      color: isCurrent ? Colors.lightGreen : Colors.grey[400],
+      color: isCurrent ? kSuccessColor : kDarkGrayColor,
       widget: ConstrainedBox(
         constraints: BoxConstraints(
           minWidth: MediaQuery.of(context).size.width * .2,

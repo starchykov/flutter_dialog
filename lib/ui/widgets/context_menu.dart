@@ -239,8 +239,8 @@ class _ContextMenu extends StatelessWidget {
     return Stack(
       children: [
         BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-          child: Container(height: MediaQuery.of(context).size.height, color: Colors.black45),
+          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+          child: Container(height: MediaQuery.of(context).size.height, color: CupertinoColors.separator),
         ),
         Positioned(
           top: topOffset,
@@ -250,9 +250,9 @@ class _ContextMenu extends StatelessWidget {
             width: maxMenuWidth,
             height: menuHeight,
             decoration: BoxDecoration(
-              color: CupertinoColors.systemBackground.withOpacity(.5),
+              color: CupertinoTheme.of(context).scaffoldBackgroundColor.withOpacity(.5),
               borderRadius: BorderRadius.all(Radius.circular(borderRadius)),
-              boxShadow: const [BoxShadow(color: Colors.black38, blurRadius: 10, spreadRadius: 1)],
+              boxShadow: const [BoxShadow(color: CupertinoColors.secondarySystemFill, blurRadius: 10, spreadRadius: 1)],
             ),
             child: ListView.builder(
               itemCount: actions.length,
@@ -267,7 +267,7 @@ class _ContextMenu extends StatelessWidget {
                   alignment: Alignment.center,
                   margin: const EdgeInsets.only(bottom: 1),
                   padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                  color: actions[index].backgroundColor ?? CupertinoColors.systemBackground.withOpacity(.3),
+                  color: actions[index].backgroundColor ?? CupertinoTheme.of(context).scaffoldBackgroundColor.withOpacity(.3),
                   height: menuActionHeight ?? 45.0,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -278,7 +278,7 @@ class _ContextMenu extends StatelessWidget {
                               TextStyle(
                                 color: actions[index].negativeAction ?? false
                                     ? CupertinoColors.destructiveRed
-                                    : Theme.of(context).textTheme.subtitle1?.color,
+                                    : CupertinoTheme.of(context).textTheme.textStyle.color,
                               ),
                             ),
                       ),

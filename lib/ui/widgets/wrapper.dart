@@ -43,7 +43,7 @@ class MaterialWrapper extends StatelessWidget {
         color: Colors.transparent,
         child: Container(
           margin: const EdgeInsets.only(top: kDefaultTextSpace, bottom: kDefaultTextSpace),
-          padding: const EdgeInsets.symmetric(vertical: kDefaultDoubleBoxPadding, horizontal: kDefaultDoubleBoxPadding),
+          padding: const EdgeInsets.symmetric(vertical: kDefaultDoubleOffset, horizontal: kDefaultOffset),
           decoration: BoxDecoration(
             color: color ?? kBackgroundBlue,
             borderRadius: BorderRadius.only(

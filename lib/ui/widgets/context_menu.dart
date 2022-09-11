@@ -152,7 +152,7 @@ class ContextMenuState extends State<ContextMenu> {
             childSize: childSize,
             menuWidth: widget.menuWidth,
             bottomOffsetHeight: widget.bottomOffsetHeight ?? 0,
-            borderRadius: widget.borderRadius ?? 20,
+            borderRadius: widget.borderRadius ?? 10,
             menuOffset: widget.menuOffset ?? 0,
             menuActionHeight: widget.menuActionHeight,
             onPress: _closeContextMenu,
@@ -220,7 +220,7 @@ class _ContextMenu extends StatelessWidget {
     double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
 
     final maxMenuHeight = size.height * 0.45;
-    final listHeight = actions.length * (menuActionHeight ?? 50.0);
+    final listHeight = actions.length * (menuActionHeight ?? 45.0);
 
     final maxMenuWidth = menuWidth ?? (childSize.width >= size.width * 0.4 ? childSize.width : size.width);
     final menuHeight = listHeight < maxMenuHeight ? listHeight : maxMenuHeight;
@@ -250,7 +250,7 @@ class _ContextMenu extends StatelessWidget {
             width: maxMenuWidth,
             height: menuHeight,
             decoration: BoxDecoration(
-              color: Colors.grey.shade200,
+              color: CupertinoColors.systemBackground.withOpacity(.5),
               borderRadius: BorderRadius.all(Radius.circular(borderRadius)),
               boxShadow: const [BoxShadow(color: Colors.black38, blurRadius: 10, spreadRadius: 1)],
             ),
@@ -266,9 +266,9 @@ class _ContextMenu extends StatelessWidget {
                 child: Container(
                   alignment: Alignment.center,
                   margin: const EdgeInsets.only(bottom: 1),
-                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                  color: actions[index].backgroundColor ?? Colors.white,
-                  height: menuActionHeight ?? 50.0,
+                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  color: actions[index].backgroundColor ?? CupertinoColors.systemBackground.withOpacity(.3),
+                  height: menuActionHeight ?? 45.0,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[

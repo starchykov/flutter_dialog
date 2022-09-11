@@ -1,15 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_dialog/constants/constants.dart';
-import 'package:flutter_dialog/dialog/messages_inherit.dart';
+import 'package:flutter_dialog/ui/views/messages_screen/messages_screen_state.dart';
+import 'package:flutter_dialog/ui/views/messages_screen/messages_screen_view_model.dart';
+import 'package:provider/provider.dart';
 
 class MessageLoading extends StatelessWidget {
   const MessageLoading({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    bool loading = context.dependOnInheritedWidgetOfExactType<DataMessageProvider>(aspect: 'loading')?.loading ?? false;
+    MessagesScreenState state = context.select((MessagesScreenViewModel viewModel) => viewModel.state);
     return Visibility(
-      visible: loading,
+      visible: state.loading,
       child: Align(
         alignment: Alignment.topCenter,
         child: Container(

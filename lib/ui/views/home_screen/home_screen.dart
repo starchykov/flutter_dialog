@@ -7,11 +7,6 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(
-        automaticallyImplyLeading: true,
-        previousPageTitle: 'Dialogs',
-        middle: Text('Messages'),
-      ),
       child: MessagesScreen.render(),
     );
   }

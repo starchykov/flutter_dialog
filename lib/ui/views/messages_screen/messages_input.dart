@@ -1,8 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_dialog/constants/constants.dart';
 import 'package:flutter_dialog/ui/views/messages_screen/messages_screen_state.dart';
-
 import 'package:flutter_dialog/ui/views/messages_screen/messages_screen_view_model.dart';
 import 'package:provider/provider.dart';
 
@@ -14,28 +12,28 @@ class MessagesInput extends StatelessWidget {
     MessagesScreenViewModel viewModel = context.read<MessagesScreenViewModel>();
     MessagesScreenState state = context.select((MessagesScreenViewModel viewModel) => viewModel.state);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      color: CupertinoColors.secondarySystemFill,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      color: CupertinoTheme.of(context).barBackgroundColor,
       child: SafeArea(
         top: false,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            GestureDetector(
-              onTap: () => state.messageText.isEmpty ? null : viewModel.sendMessage(),
-              child: const SizedBox(
-                width: 30,
-                height: 30,
-                child: Icon(CupertinoIcons.paperclip, color: CupertinoColors.placeholderText),
+            CupertinoButton(
+              minSize: kDefaultDoubleOffset * 4.5,
+              padding: EdgeInsets.zero,
+              onPressed: () => state.messageText.isEmpty ? null : viewModel.sendMessage(),
+              child: const Icon(
+                CupertinoIcons.paperclip,
+                color: CupertinoColors.inactiveGray,
               ),
             ),
-            const SizedBox(width: kDefaultTextSpace),
             Expanded(
               child: Container(
-                decoration: BoxDecoration(
-                  color: CupertinoTheme.of(context).barBackgroundColor,
-                  borderRadius: const BorderRadius.all(Radius.circular(20)),
+                decoration: const BoxDecoration(
+                  color: CupertinoColors.secondarySystemFill,
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
                 ),
                 child: Stack(
                   children: [
@@ -44,9 +42,8 @@ class MessagesInput extends StatelessWidget {
                       minLines: viewModel.maxLines(),
                       maxLines: 5,
                       placeholder: 'Message',
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.transparent),
-                        borderRadius: const BorderRadius.all(Radius.circular(20)),
+                      decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
                       ),
                       onChanged: (messageText) => viewModel.onMessageInputPrint(messageText: messageText),
                       controller: viewModel.inputMessageController,
@@ -57,30 +54,23 @@ class MessagesInput extends StatelessWidget {
                       child: GestureDetector(
                         onTap: viewModel.showStickers,
                         child: state.showStickers
-                            ? const Icon(CupertinoIcons.keyboard, color: CupertinoColors.placeholderText)
-                            : const Icon(CupertinoIcons.smiley, color: CupertinoColors.placeholderText),
+                            ? const Icon(CupertinoIcons.keyboard, color: CupertinoColors.inactiveGray)
+                            : const Icon(CupertinoIcons.smiley, color: CupertinoColors.inactiveGray),
                       ),
                     ),
                   ],
                 ),
               ),
             ),
-            const SizedBox(width: 8),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 5),
-              child: ClipOval(
-                child: Container(
-                  color:
-                      viewModel.isInputEmpty ? CupertinoColors.systemBlue.withOpacity(.5) : CupertinoColors.systemBlue,
-                  child: GestureDetector(
-                    onTap: () => state.messageText.isEmpty ? null : viewModel.sendMessage(),
-                    child: const SizedBox(
-                      width: 30,
-                      height: 30,
-                      child: Icon(CupertinoIcons.arrow_up, size: 20, color: CupertinoColors.white),
-                    ),
-                  ),
-                ),
+            const SizedBox(width: kDefaultTextSpace),
+            CupertinoButton(
+              minSize: kDefaultDoubleOffset * 4.5,
+              padding: EdgeInsets.zero,
+              onPressed: () => state.messageText.isEmpty ? null : viewModel.sendMessage(),
+              child: Icon(
+                CupertinoIcons.arrow_up_circle_fill,
+                size: kDefaultDoubleOffset * 4.5,
+                color: viewModel.isInputEmpty ? CupertinoColors.systemBlue.withOpacity(.5) : CupertinoColors.systemBlue,
               ),
             ),
           ],

@@ -18,10 +18,17 @@ class MessagesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      behavior: HitTestBehavior.translucent,
       onTap: () => FocusScope.of(context).unfocus(),
-      child: SafeArea(
-        bottom: false,
-        child: CupertinoPageScaffold(
+      child: CupertinoPageScaffold(
+        navigationBar:  CupertinoNavigationBar(
+          backgroundColor: CupertinoTheme.of(context).barBackgroundColor.withOpacity(.6),
+          automaticallyImplyLeading: true,
+          previousPageTitle: 'Dialogs',
+          middle: const Text('Messages'),
+        ),
+        child: SafeArea(
+          bottom: false,
           child: Stack(
             children: [
               Column(

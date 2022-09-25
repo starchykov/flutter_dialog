@@ -81,12 +81,9 @@ class MessagesScreenViewModel extends ChangeNotifier {
   }
 
   Future sendMessage() async {
-    Message newMessage = Message(
-      userName: 'John',
-      message: _inputMessageController.text,
-      isPending: 2,
-      creationDate: DateFormat('dd.MM.yyyy hh:m').format(DateTime.now()),
-    );
+    if (_inputMessageController.text.isEmpty) return;
+    String date =  DateFormat('dd.MM.yyyy hh:m').format(DateTime.now());
+    Message newMessage = Message(userName: 'John', message: _state.messageText, isPending: 2, creationDate: date);
     _state = _state.copyWith(loading: false, messages: [newMessage, ..._state.messages]);
     _inputMessageController.clear();
     notifyListeners();

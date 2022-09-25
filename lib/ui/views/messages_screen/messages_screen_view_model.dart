@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_dialog/models/message_model.dart';
 import 'package:flutter_dialog/ui/views/messages_screen/messages_screen_state.dart';
 import 'package:flutter_dialog/ui/widgets/responsive.dart';
+import 'package:intl/intl.dart';
 
 class MessagesScreenViewModel extends ChangeNotifier {
   MessagesScreenState _state = const MessagesScreenState(loading: true, messages: []);
@@ -13,7 +14,7 @@ class MessagesScreenViewModel extends ChangeNotifier {
 
   TextEditingController get inputMessageController => _inputMessageController;
 
-  bool get isInputEmpty=> _inputMessageController.text.isEmpty;
+  bool get isInputEmpty => _inputMessageController.text.isEmpty;
 
   ScrollController get scrollController => _scrollController;
 
@@ -32,11 +33,36 @@ class MessagesScreenViewModel extends ChangeNotifier {
 
     await Future<void>.delayed(const Duration(seconds: 1));
     List<Message> testDataList = [
-      const Message('John', 'This is not sent message with long text: text text text text text text', 2, '15.05.2022'),
-      const Message('Alexei', 'Hello Hello Hello Hello!', 0, '15.05.2022'),
-      const Message('John', 'This is long text message: text text text text text text text text text', 1, '15.05.2022'),
-      const Message('John', 'This is example of the Flutter dialog!', 0, '15.05.2022'),
-      const Message('John', 'Hello! ', 1, '15.05.2022'),
+      const Message(
+        userName: 'John',
+        message: 'This is not sent message with long text: text text text text text text',
+        isPending: 2,
+        creationDate: '15.05.2022',
+      ),
+      const Message(
+        userName: 'Alexei',
+        message: 'Hello Hello Hello Hello!',
+        isPending: 0,
+        creationDate: '15.05.2022',
+      ),
+      const Message(
+        userName: 'John',
+        message: 'This is long text message: text text text text text text text text text',
+        isPending: 1,
+        creationDate: '15.05.2022',
+      ),
+      const Message(
+        userName: 'John',
+        message: 'This is example of the Flutter dialog!',
+        isPending: 0,
+        creationDate: '15.05.2022',
+      ),
+      const Message(
+        userName: 'John',
+        message: 'Hello! ',
+        isPending: 1,
+        creationDate: '15.05.2022',
+      ),
     ];
 
     _state = _state.copyWith(loading: false, messages: testDataList);
@@ -55,14 +81,18 @@ class MessagesScreenViewModel extends ChangeNotifier {
   }
 
   Future sendMessage() async {
-    Message newMessage = Message('John', _inputMessageController.text, 2, '16.05.2022');
+    Message newMessage = Message(
+      userName: 'John',
+      message: _inputMessageController.text,
+      isPending: 2,
+      creationDate: DateFormat('dd.MM.yyyy hh:m').format(DateTime.now()),
+    );
     _state = _state.copyWith(loading: false, messages: [newMessage, ..._state.messages]);
     _inputMessageController.clear();
     notifyListeners();
   }
 
   bool currentUser(String user) => 'John' == user;
-
 
   int maxLines() {
     if (_inputMessageController.value.text.length <= 36) return 1;
@@ -90,7 +120,7 @@ class MessagesScreenViewModel extends ChangeNotifier {
     return messageWidth;
   }
 
-  void showStickers () {
+  void showStickers() {
     _state = _state.copyWith(showStickers: !_state.showStickers);
     notifyListeners();
   }

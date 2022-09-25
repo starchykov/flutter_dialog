@@ -1,34 +1,31 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_dialog/ui/widgets/wrapper.dart';
 import 'package:flutter_dialog/constants/constants.dart';
 import 'package:flutter_dialog/models/message_model.dart';
 
 class MessageItem extends StatelessWidget {
   final bool isCurrent;
-  final Function? onPress;
   final Message messageItem;
 
   const MessageItem({
     Key? key,
     required this.isCurrent,
-    this.onPress,
     required this.messageItem,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return MaterialWrapper(
-      borderTL: isCurrent ? 20 : 0,
-      borderTR: isCurrent ? 0 : 20,
-      color: isCurrent ? kSuccessColor : kDarkGrayColor,
-      widget: ConstrainedBox(
-        constraints: BoxConstraints(
-          minWidth: MediaQuery.of(context).size.width * .2,
-          maxWidth: MediaQuery.of(context).size.width * .8,
-        ),
-        child: IntrinsicWidth(
-          child: Column(
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        minWidth: MediaQuery.of(context).size.width * .2,
+        maxWidth: MediaQuery.of(context).size.width * .8,
+      ),
+      child: IntrinsicWidth(
+        child: Wrapper(
+          borderTL: isCurrent ? 20 : 0,
+          borderTR: isCurrent ? 0 : 20,
+          color: isCurrent ? kSuccessColor : kDarkGrayColor,
+          widget: Column(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,12 +33,13 @@ class MessageItem extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(vertical: kDefaultTextSpace),
                 child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: isCurrent ? MainAxisAlignment.end : MainAxisAlignment.start,
                   children: [
                     Flexible(
                       child: Text(
                         messageItem.message,
-                        style: const TextStyle(color: Colors.white),
+                        style: const TextStyle(color: CupertinoColors.white),
                       ),
                     ),
                   ],
@@ -52,9 +50,12 @@ class MessageItem extends StatelessWidget {
                 children: [
                   Text(
                     messageItem.creationDate,
-                    style: Theme.of(context).textTheme.caption!.merge(const TextStyle(color: Colors.white60)),
+                    style: CupertinoTheme.of(context)
+                        .textTheme
+                        .tabLabelTextStyle
+                        .merge(TextStyle(color: CupertinoColors.white.withOpacity(.6))),
                   ),
-                  const SizedBox(width: kDefaultTextSpace),
+                  const SizedBox(width: kDefaultTextSpace * 2),
                   const Spacer(),
                   Visibility(
                     visible: messageItem.isPending == 1,
@@ -64,7 +65,13 @@ class MessageItem extends StatelessWidget {
                         const CupertinoActivityIndicator(radius: 6),
                         const SizedBox(width: kDefaultTextSpace),
                         // Text('Pending...', style: TextStyle(fontSize: 11, color: Colors.black45)),
-                        Text('Pending...', style: Theme.of(context).textTheme.caption),
+                        Text(
+                          'Pending...',
+                          style: CupertinoTheme.of(context)
+                              .textTheme
+                              .tabLabelTextStyle
+                              .merge(TextStyle(color: CupertinoColors.black.withOpacity(.4))),
+                        ),
                       ],
                     ),
                   ),
@@ -73,9 +80,15 @@ class MessageItem extends StatelessWidget {
                     child: Row(
                       children: [
                         const SizedBox(width: 2),
-                        const Icon(CupertinoIcons.info_circle, size: 12, color: Colors.redAccent),
+                        const Icon(CupertinoIcons.info_circle, size: 12, color: CupertinoColors.destructiveRed),
                         const SizedBox(width: kDefaultTextSpace),
-                        Text('Not sent', style: Theme.of(context).textTheme.caption),
+                        Text(
+                          'Not sent',
+                          style: CupertinoTheme.of(context)
+                              .textTheme
+                              .tabLabelTextStyle
+                              .merge(TextStyle(color: CupertinoColors.black.withOpacity(.4))),
+                        ),
                       ],
                     ),
                   ),

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dialog/constants/constants.dart';
 
-class MaterialWrapper extends StatelessWidget {
+class Wrapper extends StatelessWidget {
   /// Widget which will be wrapper by decoration wrapper.
-  /// Value cann not be null.
+  /// Value can not be null.
   final Widget widget;
 
   /// [Material] decoration [Color] value.
@@ -28,7 +28,7 @@ class MaterialWrapper extends StatelessWidget {
 
   /// Wrapper for messages instance widget. Wrapper has default margin (top: 5, bottom: 5)
   /// and default padding (vertical: 15, horizontal: 15).
-  const MaterialWrapper({
+  const Wrapper({
     Key? key,
     required this.widget,
     this.color,
@@ -39,21 +39,20 @@ class MaterialWrapper extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => Material(
-        color: Colors.transparent,
-        child: Container(
-          margin: const EdgeInsets.only(top: kDefaultTextSpace, bottom: kDefaultTextSpace),
-          padding: const EdgeInsets.symmetric(vertical: kDefaultDoubleOffset, horizontal: kDefaultOffset),
-          decoration: BoxDecoration(
-            color: color ?? kBackgroundBlue,
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(borderBL ?? kDefaultBorderRadius),
-              bottomRight: Radius.circular(borderBR ?? kDefaultBorderRadius),
-              topLeft: Radius.circular(borderTL ?? kDefaultBorderRadius),
-              topRight: Radius.circular(borderTR ?? kDefaultBorderRadius),
-            ),
-          ),
-          child: widget,
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(top: kDefaultTextSpace, bottom: kDefaultTextSpace),
+      padding: const EdgeInsets.symmetric(vertical: kDefaultDoubleOffset, horizontal: kDefaultOffset),
+      decoration: BoxDecoration(
+        color: color ?? kBackgroundBlue,
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(borderBL ?? kDefaultBorderRadius),
+          bottomRight: Radius.circular(borderBR ?? kDefaultBorderRadius),
+          topLeft: Radius.circular(borderTL ?? kDefaultBorderRadius),
+          topRight: Radius.circular(borderTR ?? kDefaultBorderRadius),
         ),
-      );
+      ),
+      child: widget,
+    );
+  }
 }

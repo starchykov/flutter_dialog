@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_dialog/models/message_model.dart';
 
+@immutable
 class MessagesScreenState {
   final List<Message> messages;
   final bool loading;

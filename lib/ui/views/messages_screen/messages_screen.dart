@@ -6,7 +6,7 @@ import 'package:flutter_dialog/ui/views/messages_screen/messages_screen_view_mod
 import 'package:provider/provider.dart';
 
 class MessagesScreen extends StatelessWidget {
-  const MessagesScreen({super.key});
+  const MessagesScreen({Key? key}) : super(key: key);
 
   static Widget render() {
     return ChangeNotifierProvider(
@@ -16,23 +16,25 @@ class MessagesScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
-        onTap: () => FocusScope.of(context).unfocus(),
-        child: SafeArea(
-          bottom: false,
-          child: CupertinoPageScaffold(
-            child: Stack(
-              children: [
-                Column(
-                  children: const [
-                    Expanded(child: MessagesList()),
-                    MessagesInput(),
-                  ],
-                ),
-                const MessageLoading(),
-              ],
-            ),
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: SafeArea(
+        bottom: false,
+        child: CupertinoPageScaffold(
+          child: Stack(
+            children: [
+              Column(
+                children: const [
+                  Expanded(child: MessagesList()),
+                  MessagesInput(),
+                ],
+              ),
+              const MessageLoading(),
+            ],
           ),
         ),
-      );
+      ),
+    );
+  }
 }

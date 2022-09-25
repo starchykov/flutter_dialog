@@ -5,12 +5,14 @@ class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) =>  CupertinoPageScaffold(
-        navigationBar: const CupertinoNavigationBar(
-          automaticallyImplyLeading: true,
-          previousPageTitle: 'Dialogs',
-          middle: Text('Messages'),
-        ),
-        child: MessagesScreen.render(),
-      );
+  Widget build(BuildContext context) {
+    return CupertinoPageScaffold(
+      navigationBar: const CupertinoNavigationBar(
+        automaticallyImplyLeading: true,
+        previousPageTitle: 'Dialogs',
+        middle: Text('Messages'),
+      ),
+      child: MessagesScreen.render(),
+    );
+  }
 }

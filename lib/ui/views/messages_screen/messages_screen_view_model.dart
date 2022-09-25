@@ -33,7 +33,7 @@ class MessagesScreenViewModel extends ChangeNotifier {
     await Future<void>.delayed(const Duration(seconds: 1));
     List<Message> testDataList = [
       const Message('John', 'This is not sent message with long text: text text text text text text', 2, '15.05.2022'),
-      const Message('Olexei', 'Hello Hello Hello Hello!', 0, '15.05.2022'),
+      const Message('Alexei', 'Hello Hello Hello Hello!', 0, '15.05.2022'),
       const Message('John', 'This is long text message: text text text text text text text text text', 1, '15.05.2022'),
       const Message('John', 'This is example of the Flutter dialog!', 0, '15.05.2022'),
       const Message('John', 'Hello! ', 1, '15.05.2022'),
@@ -46,9 +46,7 @@ class MessagesScreenViewModel extends ChangeNotifier {
   Future scrollListener() async {
     ScrollPosition scrollPosition = _scrollController.position;
     if (_scrollController.offset >= scrollPosition.maxScrollExtent && !scrollPosition.outOfRange) {}
-    if (_scrollController.offset <= scrollPosition.minScrollExtent && !scrollPosition.outOfRange) {
-      await getMessages();
-    }
+    if (_scrollController.offset <= scrollPosition.minScrollExtent && !scrollPosition.outOfRange) await getMessages();
   }
 
   void onMessageInputPrint({required String messageText}) {

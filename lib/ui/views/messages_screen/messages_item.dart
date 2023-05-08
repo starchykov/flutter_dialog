@@ -15,17 +15,16 @@ class MessageItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: BoxConstraints(
-        minWidth: MediaQuery.of(context).size.width * .2,
-        maxWidth: MediaQuery.of(context).size.width * .8,
-      ),
-      child: IntrinsicWidth(
-        child: Wrapper(
-          borderTL: isCurrent ? 20 : 0,
-          borderTR: isCurrent ? 0 : 20,
-          color: isCurrent ? kSuccessColor : kDarkGrayColor,
-          widget: Column(
+    return Wrapper(
+      alignment: isCurrent ? MessageAlignment.end : MessageAlignment.start,
+      color: isCurrent ? kSuccessColor : kDarkGrayColor,
+      message: ConstrainedBox(
+        constraints: BoxConstraints(
+          minWidth: MediaQuery.of(context).size.width * .2,
+          maxWidth: MediaQuery.of(context).size.width * .8,
+        ),
+        child: IntrinsicWidth(
+          child: Column(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,

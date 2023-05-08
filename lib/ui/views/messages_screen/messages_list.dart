@@ -24,33 +24,30 @@ class MessagesList extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: kDefaultTextSpace, horizontal: 8.0),
       itemBuilder: (context, index) {
         bool isCurrent = viewModel.currentUser(state.messages[index].userName);
-        return Container(
-          alignment: isCurrent ? Alignment.centerRight : Alignment.centerLeft,
-          child: ContextMenu(
-            menuActionHeight: 45.0,
-            menuWidth: MediaQuery.of(context).size.width * .5,
-            bottomOffsetHeight: kDefaultTextSpace,
-            actions: [
-              if (state.messages[index].isPending == 2)
-                ContextMenuAction(
-                  icon: CupertinoIcons.arrow_up_circle,
-                  title: 'Resent',
-                  onPress: () {},
-                ),
-              ContextMenuAction(
-                icon: CupertinoIcons.doc_on_clipboard,
-                title: 'Copy',
+        return ContextMenu(
+          menuActionHeight: 45.0,
+          menuWidth: MediaQuery.of(context).size.width * .5,
+          bottomOffsetHeight: kDefaultTextSpace,
+          alignment: isCurrent ? ContextMenuAlignment.end : ContextMenuAlignment.start,
+          actions: [
+            if (state.messages[index].isPending == 2) ContextMenuAction(
+                icon: CupertinoIcons.arrow_up_circle,
+                title: 'Resent',
                 onPress: () {},
               ),
-              ContextMenuAction(
-                icon: CupertinoIcons.delete,
-                title: 'Delete',
-                negativeAction: true,
-                onPress: () {},
-              ),
-            ],
-            child: MessageItem(isCurrent: isCurrent, messageItem: state.messages[index]),
-          ),
+            ContextMenuAction(
+              icon: CupertinoIcons.doc_on_clipboard,
+              title: 'Copy',
+              onPress: () {},
+            ),
+            ContextMenuAction(
+              icon: CupertinoIcons.delete,
+              title: 'Delete',
+              negativeAction: true,
+              onPress: () {},
+            ),
+          ],
+          child: MessageItem(isCurrent: isCurrent, messageItem: state.messages[index]),
         );
       },
     );

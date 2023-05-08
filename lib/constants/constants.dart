@@ -25,7 +25,9 @@ const kDarkGrayColor = CupertinoColors.separator;
 const kTitleTextColor = Color(0xFF30384D);
 const kTextColor = Color(0xFF4D5875);
 
+const kHeadFontSize = 14.0;
 const kDefaultFontSize = 14.0;
+const kSmallFontSize = 14.0;
 
 const kDefaultOffset = 16.0;
 const kDefaultDoubleOffset = 8.0;

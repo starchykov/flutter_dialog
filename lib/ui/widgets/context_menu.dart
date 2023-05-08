@@ -1,8 +1,11 @@
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+enum Blur {blured, clear}
+
+enum ContextMenuAlignment {start, end}
 
 class ContextMenuAction {
   /// Menu action title widget.
@@ -29,6 +32,7 @@ class ContextMenuAction {
   ///
   /// Example: const Colors.white
   final bool? negativeAction;
+
 
   /// The menu that displays when ContextMenu is open. It consists of a
   /// list of actions.
@@ -66,7 +70,6 @@ class ContextMenu extends StatefulWidget {
   /// Default [ContextMenuAction]s height is 50.0
   final double? menuActionHeight;
 
-
   /// [ContextMenu] child widget indent can be configured.
   ///
   /// Default [ContextMenuAction]s indent is 0
@@ -98,6 +101,9 @@ class ContextMenu extends StatefulWidget {
   /// Default [showByTap] value is false
   final bool showByTap;
 
+  final Blur blur;
+  final ContextMenuAlignment alignment;
+
   const ContextMenu({
     Key? key,
     required this.child,
@@ -109,6 +115,8 @@ class ContextMenu extends StatefulWidget {
     this.menuOffset,
     this.bottomOffsetHeight,
     this.showByTap = false,
+    this.blur = Blur.blured,
+    this.alignment = ContextMenuAlignment.end,
   }) : super(key: key);
 
   @override
@@ -148,6 +156,8 @@ class ContextMenuState extends State<ContextMenu> {
           onTap: _closeContextMenu,
           child: _ContextMenu(
             actions: widget.actions,
+            isBlur: widget.blur,
+            alignment: widget.alignment,
             childOffset: childOffset,
             childSize: childSize,
             menuWidth: widget.menuWidth,
@@ -167,7 +177,7 @@ class ContextMenuState extends State<ContextMenu> {
     setState(() {
       if (_isContextMenuOpen) return _contextMenu.remove();
       _contextMenu = _createContextMenu();
-      Overlay.of(context)?.insert(_contextMenu);
+      Overlay.of(context).insert(_contextMenu);
       _isContextMenuOpen = !_isContextMenuOpen;
     });
   }
@@ -198,6 +208,8 @@ class _ContextMenu extends StatelessWidget {
   final double bottomOffsetHeight;
   final double menuOffset;
   final Function onPress;
+  final ContextMenuAlignment alignment;
+  final Blur isBlur;
 
   const _ContextMenu({
     Key? key,
@@ -211,6 +223,8 @@ class _ContextMenu extends StatelessWidget {
     required this.bottomOffsetHeight,
     required this.menuOffset,
     required this.onPress,
+    required this.isBlur,
+    required this.alignment,
   }) : super(key: key);
 
   @override
@@ -219,13 +233,13 @@ class _ContextMenu extends StatelessWidget {
 
     double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
 
-    final maxMenuHeight = size.height * 0.45;
-    final listHeight = actions.length * (menuActionHeight ?? 45.0);
+    final maxMenuHeight = size.height * 0.5;
+    final listHeight = actions.length * (menuActionHeight ?? 50.0);
 
-    final maxMenuWidth = menuWidth ?? (childSize.width >= size.width * 0.4 ? childSize.width : size.width);
+    final maxMenuWidth = menuWidth ?? (size.width * 0.4);
     final menuHeight = listHeight < maxMenuHeight ? listHeight : maxMenuHeight;
 
-    final leftOffset = (childOffset.dx + maxMenuWidth) < size.width
+    final leftOffset = (childOffset.dx + maxMenuWidth + menuOffset) < size.width
         ? childOffset.dx + menuOffset
         : (childOffset.dx - maxMenuWidth + childSize.width - menuOffset);
 
@@ -233,8 +247,8 @@ class _ContextMenu extends StatelessWidget {
     final screenSize = size.height - bottomOffsetHeight - keyboardHeight;
 
     final topOffset = actionsOffset < screenSize
-        ? childOffset.dy + childSize.height + bottomOffsetHeight
-        : childOffset.dy - menuHeight - bottomOffsetHeight;
+        ? childOffset.dy + childSize.height + menuOffset + bottomOffsetHeight
+        : childOffset.dy - menuHeight - menuOffset - bottomOffsetHeight;
 
     return Stack(
       children: [
@@ -244,7 +258,8 @@ class _ContextMenu extends StatelessWidget {
         ),
         Positioned(
           top: topOffset,
-          left: leftOffset,
+          left:  alignment == ContextMenuAlignment.start ? leftOffset : null,
+          right: alignment == ContextMenuAlignment.end ? leftOffset : null,
           child: Container(
             clipBehavior: Clip.antiAlias,
             width: maxMenuWidth,
@@ -254,46 +269,52 @@ class _ContextMenu extends StatelessWidget {
               borderRadius: BorderRadius.all(Radius.circular(borderRadius)),
               boxShadow: const [BoxShadow(color: CupertinoColors.secondarySystemFill, blurRadius: 10, spreadRadius: 1)],
             ),
-            child: ListView.builder(
-              itemCount: actions.length,
-              padding: EdgeInsets.zero,
-              physics: const NeverScrollableScrollPhysics(),
-              itemBuilder: (context, index) => GestureDetector(
-                onTap: () {
-                  onPress();
-                  actions[index].onPress();
-                },
-                child: Container(
-                  alignment: Alignment.center,
-                  margin: const EdgeInsets.only(bottom: 1),
-                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                  color: actions[index].backgroundColor ?? CupertinoTheme.of(context).scaffoldBackgroundColor.withOpacity(.3),
-                  height: menuActionHeight ?? 45.0,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Text(
-                        actions[index].title,
-                        style: Theme.of(context).textTheme.subtitle1?.merge(
-                              TextStyle(
-                                color: actions[index].negativeAction ?? false
-                                    ? CupertinoColors.destructiveRed
-                                    : CupertinoTheme.of(context).textTheme.textStyle.color,
-                              ),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5, tileMode: TileMode.clamp),
+              child: ListView.builder(
+                itemCount: actions.length,
+                padding: EdgeInsets.zero,
+                physics: const NeverScrollableScrollPhysics(),
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () {
+                      onPress();
+                      actions[index].onPress();
+                    },
+                    child: Container(
+                      alignment: Alignment.center,
+                      margin: const EdgeInsets.only(bottom: 1),
+                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                      color: actions[index].backgroundColor ??
+                          CupertinoTheme.of(context).scaffoldBackgroundColor.withOpacity(.3),
+                      height: menuActionHeight ?? 45.0,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text(
+                            actions[index].title,
+                            style: CupertinoTheme.of(context).textTheme.textStyle.merge(
+                                  TextStyle(
+                                    color: actions[index].negativeAction ?? false
+                                        ? CupertinoColors.destructiveRed
+                                        : CupertinoTheme.of(context).textTheme.textStyle.color,
+                                  ),
+                                ),
+                          ),
+                          Visibility(
+                            visible: actions[index].icon != null,
+                            child: Icon(
+                              actions[index].icon,
+                              color: actions[index].negativeAction ?? false
+                                  ? CupertinoColors.destructiveRed
+                                  : CupertinoTheme.of(context).primaryColor,
                             ),
+                          )
+                        ],
                       ),
-                      Visibility(
-                        visible: actions[index].icon != null,
-                        child: Icon(
-                          actions[index].icon,
-                          color: actions[index].negativeAction ?? false
-                              ? CupertinoColors.destructiveRed
-                              : Theme.of(context).primaryColor,
-                        ),
-                      )
-                    ],
-                  ),
-                ),
+                    ),
+                  );
+                },
               ),
             ),
           ),

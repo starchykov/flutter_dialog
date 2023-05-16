@@ -123,6 +123,8 @@ class ContextMenu extends StatefulWidget {
   State<ContextMenu> createState() => ContextMenuState();
 }
 
+/// This is the stateful widget for creating a context menu.
+/// It extends the State class and is parameterized with the generic type ContextMenu.
 class ContextMenuState extends State<ContextMenu> {
   final GlobalKey containerKey = GlobalKey();
   Offset childOffset = const Offset(0, 0);
@@ -133,23 +135,30 @@ class ContextMenuState extends State<ContextMenu> {
   @override
   void initState() {
     super.initState();
+    /// Initialize the state variables.
     _isContextMenuOpen = false;
+    /// Add a post-frame callback to ensure that the layout is complete before initializing the context menu.
     WidgetsBinding.instance.addPostFrameCallback(_afterLayout);
   }
 
+  /// This function is called after the layout is complete to configure the context menu.
   void _afterLayout(Duration duration) => _configureContextMenu();
 
+  /// This function configures the position and size of the context menu based on the position and size of the child widget.
   void _configureContextMenu() {
+    /// Find the render object of the container using its global key.
     RenderBox renderBox = containerKey.currentContext!.findRenderObject() as RenderBox;
+    /// Get the size and position of the child widget.
     Size size = renderBox.size;
     Offset offset = renderBox.localToGlobal(Offset.zero);
-
+    /// Update the state variables.
     setState(() {
       childOffset = Offset(offset.dx, offset.dy);
       childSize = size;
     });
   }
 
+  /// TThis function is responsible for creating an overlay entry for the context menu.
   OverlayEntry _createContextMenu() => OverlayEntry(
         builder: (context) => GestureDetector(
           behavior: HitTestBehavior.translucent,
@@ -171,9 +180,13 @@ class ContextMenuState extends State<ContextMenu> {
         ),
       );
 
+  /// This function is responsible for the context menu showing.
   void _showContextMenu() {
+    /// Configure the context menu.
     _configureContextMenu();
+    /// Trigger haptic feedback.
     HapticFeedback.mediumImpact();
+    /// Update the state variables to show or hide the context menu.
     setState(() {
       if (_isContextMenuOpen) return _contextMenu.remove();
       _contextMenu = _createContextMenu();
@@ -182,6 +195,7 @@ class ContextMenuState extends State<ContextMenu> {
     });
   }
 
+  /// This function is responsible for the context menu closing.
   void _closeContextMenu() {
     if (_isContextMenuOpen == true) {
       _contextMenu.remove();
@@ -189,6 +203,7 @@ class ContextMenuState extends State<ContextMenu> {
     }
   }
 
+  /// This widget returns a GestureDetector with the child widget wrapped inside a container with a global key.
   @override
   Widget build(BuildContext context) => GestureDetector(
         onTap: () => widget.showByTap ? _showContextMenu() : null,

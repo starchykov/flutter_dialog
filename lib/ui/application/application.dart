@@ -8,9 +8,8 @@ class DialogApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const CupertinoApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
       theme: CupertinoThemeData(
-        brightness: Brightness.dark,
+        brightness: Brightness.light,
         scaffoldBackgroundColor: CupertinoColors.systemBackground,
       ),
       home: HomeScreen(),

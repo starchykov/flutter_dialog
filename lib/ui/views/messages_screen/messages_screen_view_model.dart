@@ -89,7 +89,7 @@ class MessagesScreenViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool currentUser(String user) => 'John' == user;
+  bool isCurrentUser(String user) => 'John' == user;
 
   int maxLines() {
     if (_inputMessageController.value.text.length <= 36) return 1;

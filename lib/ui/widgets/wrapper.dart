@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_dialog/constants/constants.dart';
 
 enum MessageAlignment {start, end}
@@ -57,14 +57,14 @@ class Wrapper extends StatelessWidget {
         sticker ?? const SizedBox(),
         Container(
           margin: const EdgeInsets.symmetric(vertical: 5),
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+          padding: const EdgeInsets.symmetric(vertical: kOffsetDouble, horizontal: kOffsetDouble + kOffsetDefault),
           decoration: BoxDecoration(
             color: color,
             borderRadius: BorderRadius.only(
-              bottomLeft: const Radius.circular(20.0),
-              bottomRight: const Radius.circular(20.0),
-              topLeft: Radius.circular(alignment == MessageAlignment.end ? 20.0 : 0),
-              topRight: Radius.circular(alignment == MessageAlignment.start ? 20.0 : 0),
+              bottomLeft: const Radius.circular(kBorderRadiusDefault),
+              bottomRight: const Radius.circular(kBorderRadiusDefault),
+              topLeft: Radius.circular(alignment == MessageAlignment.end ? kBorderRadiusDefault : 0),
+              topRight: Radius.circular(alignment == MessageAlignment.start ? kBorderRadiusDefault : 0),
             ),
           ),
           child: message,

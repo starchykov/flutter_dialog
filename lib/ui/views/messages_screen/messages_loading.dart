@@ -17,22 +17,22 @@ class MessageLoading extends StatelessWidget {
         child: Container(
           height: 30,
           width: MediaQuery.of(context).size.width * .4,
-          margin: const EdgeInsets.all(kDefaultBoxMargin),
-          padding: const EdgeInsets.all(kDefaultTextSpace),
+          margin: const EdgeInsets.all(kBoxMarginDefault),
+          padding: const EdgeInsets.all(kTextSpaceDefault),
           decoration: const BoxDecoration(
-            color: kGrayColor,
+            color: kTransparencyGrayColor,
             borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(kDefaultBorderRadius),
-              bottomRight: Radius.circular(kDefaultBorderRadius),
-              topLeft: Radius.circular(kDefaultBorderRadius),
-              topRight: Radius.circular(kDefaultBorderRadius),
+              bottomLeft: Radius.circular(kBorderRadiusDefault),
+              bottomRight: Radius.circular(kBorderRadiusDefault),
+              topLeft: Radius.circular(kBorderRadiusDefault),
+              topRight: Radius.circular(kBorderRadiusDefault),
             ),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const CupertinoActivityIndicator(radius: 8),
-              const SizedBox(width: kDefaultDoubleOffset),
+              const CupertinoActivityIndicator(radius: kOffsetDouble),
+              const SizedBox(width: kOffsetDouble),
               Text(
                 'Loading',
                 style: TextStyle(

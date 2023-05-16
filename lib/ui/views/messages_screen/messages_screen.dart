@@ -27,17 +27,17 @@ class MessagesScreen extends StatelessWidget {
           previousPageTitle: 'Dialogs',
           middle: const Text('Messages'),
         ),
-        child: SafeArea(
+        child: const SafeArea(
           bottom: false,
           child: Stack(
             children: [
               Column(
-                children: const [
+                children: [
                   Expanded(child: MessagesList()),
                   MessagesInput(),
                 ],
               ),
-              const MessageLoading(),
+              MessageLoading(),
             ],
           ),
         ),

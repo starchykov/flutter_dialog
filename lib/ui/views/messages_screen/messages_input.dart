@@ -12,7 +12,7 @@ class MessagesInput extends StatelessWidget {
     MessagesScreenViewModel viewModel = context.read<MessagesScreenViewModel>();
     MessagesScreenState state = context.select((MessagesScreenViewModel viewModel) => viewModel.state);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: kOffsetDouble, vertical: kOffsetDouble),
       color: CupertinoTheme.of(context).barBackgroundColor,
       child: SafeArea(
         top: false,
@@ -21,56 +21,56 @@ class MessagesInput extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             CupertinoButton(
-              minSize: kDefaultDoubleOffset * 4.5,
+              minSize: kOffsetDouble * 4.5,
               padding: EdgeInsets.zero,
               onPressed: () => state.messageText.isEmpty ? null : viewModel.sendMessage(),
               child: const Icon(
                 CupertinoIcons.paperclip,
-                color: CupertinoColors.inactiveGray,
+                color: kGrayColor,
               ),
             ),
             Expanded(
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: CupertinoColors.secondarySystemFill,
-                  borderRadius: BorderRadius.all(Radius.circular(20)),
-                ),
-                child: Stack(
-                  children: [
-                    CupertinoTextField(
-                      padding: const EdgeInsets.only(left: 8, right: 28, top: 8, bottom: 8),
-                      minLines: viewModel.maxLines(),
-                      maxLines: 5,
-                      placeholder: 'Message',
-                      decoration: const BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                      ),
-                      onChanged: (messageText) => viewModel.onMessageInputPrint(messageText: messageText),
-                      controller: viewModel.inputMessageController,
+              child: Stack(
+                children: [
+                  CupertinoTextField(
+                    padding: const EdgeInsets.only(
+                      left: kOffsetDouble,
+                      right: kOffsetDouble * 4,
+                      top: kOffsetDouble,
+                      bottom: kOffsetDouble,
                     ),
-                    Positioned(
-                      bottom: 7,
-                      right: 8,
-                      child: GestureDetector(
-                        onTap: viewModel.showStickers,
-                        child: state.showStickers
-                            ? const Icon(CupertinoIcons.keyboard, color: CupertinoColors.inactiveGray)
-                            : const Icon(CupertinoIcons.smiley, color: CupertinoColors.inactiveGray),
-                      ),
+                    minLines: viewModel.maxLines(),
+                    maxLines: 5,
+                    placeholder: 'Message',
+                    decoration: const BoxDecoration(
+                      color: kBackgroundGray,
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
                     ),
-                  ],
-                ),
+                    onChanged: (messageText) => viewModel.onMessageInputPrint(messageText: messageText),
+                    controller: viewModel.inputMessageController,
+                  ),
+                  Positioned(
+                    bottom: kOffsetDouble - 2,
+                    right: kOffsetDouble,
+                    child: GestureDetector(
+                      onTap: viewModel.showStickers,
+                      child: state.showStickers
+                          ? const Icon(CupertinoIcons.keyboard, color: kGrayColor)
+                          : const Icon(CupertinoIcons.smiley, color: kGrayColor),
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(width: kDefaultTextSpace),
+            const SizedBox(width: kTextSpaceDefault),
             CupertinoButton(
-              minSize: kDefaultDoubleOffset * 4.5,
+              minSize: kOffsetDouble * 4.5,
               padding: EdgeInsets.zero,
               onPressed: () => state.messageText.isEmpty ? null : viewModel.sendMessage(),
               child: Icon(
                 CupertinoIcons.arrow_up_circle_fill,
-                size: kDefaultDoubleOffset * 4.5,
-                color: viewModel.isInputEmpty ? CupertinoColors.systemBlue.withOpacity(.5) : CupertinoColors.systemBlue,
+                size: kOffsetDouble * 4.5,
+                color: viewModel.isInputEmpty ? kPrimaryColor.withOpacity(.5) : kPrimaryColor,
               ),
             ),
           ],

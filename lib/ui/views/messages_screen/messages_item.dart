@@ -30,7 +30,7 @@ class MessageItem extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(vertical: kDefaultTextSpace),
+                padding: const EdgeInsets.symmetric(vertical: kTextSpaceDefault),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: isCurrent ? MainAxisAlignment.end : MainAxisAlignment.start,
@@ -38,7 +38,7 @@ class MessageItem extends StatelessWidget {
                     Flexible(
                       child: Text(
                         messageItem.message,
-                        style: const TextStyle(color: CupertinoColors.white),
+                        style: const TextStyle(color: CupertinoColors.white, fontSize: kDefaultFontSize),
                       ),
                     ),
                   ],
@@ -54,7 +54,7 @@ class MessageItem extends StatelessWidget {
                         .tabLabelTextStyle
                         .merge(TextStyle(color: CupertinoColors.white.withOpacity(.6))),
                   ),
-                  const SizedBox(width: kDefaultTextSpace * 2),
+                  const SizedBox(width: kTextSpaceDefault * 2),
                   const Spacer(),
                   Visibility(
                     visible: messageItem.isPending == 1,
@@ -62,7 +62,7 @@ class MessageItem extends StatelessWidget {
                       children: <Widget>[
                         const SizedBox(width: 2),
                         const CupertinoActivityIndicator(radius: 6),
-                        const SizedBox(width: kDefaultTextSpace),
+                        const SizedBox(width: kTextSpaceDefault),
                         // Text('Pending...', style: TextStyle(fontSize: 11, color: Colors.black45)),
                         Text(
                           'Pending...',
@@ -80,7 +80,7 @@ class MessageItem extends StatelessWidget {
                       children: [
                         const SizedBox(width: 2),
                         const Icon(CupertinoIcons.info_circle, size: 12, color: CupertinoColors.destructiveRed),
-                        const SizedBox(width: kDefaultTextSpace),
+                        const SizedBox(width: kTextSpaceDefault),
                         Text(
                           'Not sent',
                           style: CupertinoTheme.of(context)

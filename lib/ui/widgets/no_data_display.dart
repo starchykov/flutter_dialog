@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter_dialog/constants/constants.dart';
 
 class NoDataToDisplay extends StatelessWidget {
   final String text;
@@ -20,9 +20,9 @@ class NoDataToDisplay extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(CupertinoIcons.tray, color: Colors.grey),
-              const SizedBox(width: 10),
-              Text(text, style: const TextStyle(fontSize: 16, color: Colors.grey)),
+              const Icon(CupertinoIcons.tray, color: kGrayColor),
+              const SizedBox(width: kOffsetDouble),
+              Text(text, style: const TextStyle(fontSize: kDefaultFontSize, color: kGrayColor)),
             ],
           ),
         ),

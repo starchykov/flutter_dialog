@@ -4,13 +4,17 @@ import 'package:flutter_dialog/ui/views/messages_screen/messages_screen_state.da
 import 'package:flutter_dialog/ui/views/messages_screen/messages_screen_view_model.dart';
 import 'package:provider/provider.dart';
 
+/// A widget that provides an input field for sending messages.
 class MessagesInput extends StatelessWidget {
-  const MessagesInput({Key? key}) : super(key: key);
+
+  /// Constructs a MessagesInput widget.
+  /// [key] is an optional parameter used to identify this widget in the widget tree.
+  const MessagesInput({super.key});
 
   @override
   Widget build(BuildContext context) {
-    MessagesScreenViewModel viewModel = context.read<MessagesScreenViewModel>();
-    MessagesScreenState state = context.select((MessagesScreenViewModel viewModel) => viewModel.state);
+    final MessagesScreenViewModel viewModel = context.read<MessagesScreenViewModel>();
+    final MessagesScreenState state = context.select((MessagesScreenViewModel viewModel) => viewModel.state);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: kOffsetDouble, vertical: kOffsetDouble),
       color: CupertinoTheme.of(context).barBackgroundColor,
@@ -70,7 +74,7 @@ class MessagesInput extends StatelessWidget {
               child: Icon(
                 CupertinoIcons.arrow_up_circle_fill,
                 size: kOffsetDouble * 4.5,
-                color: viewModel.isInputEmpty ? kPrimaryColor.withOpacity(.5) : kPrimaryColor,
+                color: viewModel.inputMessageController.text.isEmpty ? kPrimaryColor.withOpacity(.5) : kPrimaryColor,
               ),
             ),
           ],

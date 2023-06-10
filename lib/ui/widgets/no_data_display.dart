@@ -2,13 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_dialog/constants/constants.dart';
 
 class NoDataToDisplay extends StatelessWidget {
+  const NoDataToDisplay({super.key, required this.text, this.top = 0});
   final String text;
 
   /// Additional required space on top
   /// Change value according to navigationBar and AppBar
   final double top;
-
-  const NoDataToDisplay({Key? key, required this.text, this.top = 0}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => SingleChildScrollView(

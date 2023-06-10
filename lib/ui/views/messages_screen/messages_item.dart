@@ -1,17 +1,26 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_dialog/ui/widgets/wrapper.dart';
 import 'package:flutter_dialog/constants/constants.dart';
 import 'package:flutter_dialog/models/message_model.dart';
+import 'package:flutter_dialog/ui/widgets/wrapper.dart';
 
+/// A widget representing an individual message item.
 class MessageItem extends StatelessWidget {
-  final bool isCurrent;
-  final Message messageItem;
 
+  /// Creates a new instance of the [MessageItem] class.
+  ///
+  /// The [isCurrent] parameter indicates whether the message is from the current user.
+  /// The [messageItem] parameter represents the message to be displayed.
   const MessageItem({
-    Key? key,
     required this.isCurrent,
     required this.messageItem,
-  }) : super(key: key);
+    super.key,
+  });
+
+  /// Indicates whether the message is from the current user.
+  final bool isCurrent;
+
+  /// The message to be displayed.
+  final Message messageItem;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +46,7 @@ class MessageItem extends StatelessWidget {
                   children: [
                     Flexible(
                       child: Text(
-                        messageItem.message,
+                        messageItem.messageText,
                         style: const TextStyle(color: CupertinoColors.white, fontSize: kDefaultFontSize),
                       ),
                     ),
@@ -63,7 +72,6 @@ class MessageItem extends StatelessWidget {
                         const SizedBox(width: 2),
                         const CupertinoActivityIndicator(radius: 6),
                         const SizedBox(width: kTextSpaceDefault),
-                        // Text('Pending...', style: TextStyle(fontSize: 11, color: Colors.black45)),
                         Text(
                           'Pending...',
                           style: CupertinoTheme.of(context)

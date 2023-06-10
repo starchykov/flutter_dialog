@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 
 enum Blur {blured, clear}
 
+/// The ContextMenuAlignment enum represents two possible alignments for a context menu: start and end.
+/// It can be used to define the alignment of a context menu based on the UI requirements.
 enum ContextMenuAlignment {start, end}
 
 class ContextMenuAction {
@@ -34,18 +36,31 @@ class ContextMenuAction {
   final bool? negativeAction;
 
 
-  /// The menu that displays when ContextMenu is open. It consists of a
-  /// list of actions.
+  /// The menu that displays when ContextMenu is open.
+  /// It consists of a list of actions.
   const ContextMenuAction({
     required this.title,
-    this.icon,
-    required this.onPress,
+    required this.onPress, this.icon,
     this.backgroundColor,
     this.negativeAction,
   });
 }
 
 class ContextMenu extends StatefulWidget {
+
+  const ContextMenu({
+    required this.child, required this.actions, super.key,
+    this.menuActionHeight,
+    this.menuWidth,
+    this.borderRadius,
+    this.childOffset,
+    this.menuOffset,
+    this.bottomOffsetHeight,
+    this.showByTap = false,
+    this.blur = Blur.blured,
+    this.alignment = ContextMenuAlignment.end,
+  });
+
   /// The widget that can be "opened" with the [ContextMenu].
   ///
   /// When the [ContextMenu] is long-pressed (tapped or if [showByTap] is 'true'), the menu will open and
@@ -104,21 +119,6 @@ class ContextMenu extends StatefulWidget {
   final Blur blur;
   final ContextMenuAlignment alignment;
 
-  const ContextMenu({
-    Key? key,
-    required this.child,
-    required this.actions,
-    this.menuActionHeight,
-    this.menuWidth,
-    this.borderRadius,
-    this.childOffset,
-    this.menuOffset,
-    this.bottomOffsetHeight,
-    this.showByTap = false,
-    this.blur = Blur.blured,
-    this.alignment = ContextMenuAlignment.end,
-  }) : super(key: key);
-
   @override
   State<ContextMenu> createState() => ContextMenuState();
 }
@@ -147,10 +147,10 @@ class ContextMenuState extends State<ContextMenu> {
   /// This function configures the position and size of the context menu based on the position and size of the child widget.
   void _configureContextMenu() {
     /// Find the render object of the container using its global key.
-    RenderBox renderBox = containerKey.currentContext!.findRenderObject() as RenderBox;
+    final RenderBox renderBox = containerKey.currentContext?.findRenderObject() as RenderBox;
     /// Get the size and position of the child widget.
-    Size size = renderBox.size;
-    Offset offset = renderBox.localToGlobal(Offset.zero);
+    final Size size = renderBox.size;
+    final Offset offset = renderBox.localToGlobal(Offset.zero);
     /// Update the state variables.
     setState(() {
       childOffset = Offset(offset.dx, offset.dy);
@@ -213,6 +213,21 @@ class ContextMenuState extends State<ContextMenu> {
 }
 
 class _ContextMenu extends StatelessWidget {
+  const _ContextMenu({
+    required this.child,
+    required this.childSize,
+    required this.childOffset,
+    required this.actions,
+    required this.borderRadius,
+    required this.bottomOffsetHeight,
+    required this.menuOffset,
+    required this.onPress,
+    required this.isBlur,
+    required this.alignment,
+    this.menuActionHeight,
+    this.menuWidth,
+  });
+
   final Widget child;
   final List<ContextMenuAction> actions;
   final Size childSize;
@@ -226,27 +241,12 @@ class _ContextMenu extends StatelessWidget {
   final ContextMenuAlignment alignment;
   final Blur isBlur;
 
-  const _ContextMenu({
-    Key? key,
-    required this.child,
-    required this.childSize,
-    required this.childOffset,
-    required this.actions,
-    this.menuActionHeight,
-    this.menuWidth,
-    required this.borderRadius,
-    required this.bottomOffsetHeight,
-    required this.menuOffset,
-    required this.onPress,
-    required this.isBlur,
-    required this.alignment,
-  }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
+    final Size size = MediaQuery.of(context).size;
 
-    double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    final double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    const double screenPadding = 16;
 
     final maxMenuHeight = size.height * 0.5;
     final listHeight = actions.length * (menuActionHeight ?? 50.0);
@@ -259,7 +259,7 @@ class _ContextMenu extends StatelessWidget {
         : (childOffset.dx - maxMenuWidth + childSize.width - menuOffset);
 
     final actionsOffset = childOffset.dy + menuHeight + childSize.height;
-    final screenSize = size.height - bottomOffsetHeight - keyboardHeight;
+    final screenSize = size.height - bottomOffsetHeight - keyboardHeight - screenPadding;
 
     final topOffset = actionsOffset < screenSize
         ? childOffset.dy + childSize.height + menuOffset + bottomOffsetHeight
@@ -285,7 +285,7 @@ class _ContextMenu extends StatelessWidget {
               boxShadow: const [BoxShadow(color: CupertinoColors.secondarySystemFill, blurRadius: 10, spreadRadius: 1)],
             ),
             child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5, tileMode: TileMode.clamp),
+              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
               child: ListView.builder(
                 itemCount: actions.length,
                 padding: EdgeInsets.zero,
@@ -338,7 +338,6 @@ class _ContextMenu extends StatelessWidget {
           top: childOffset.dy,
           left: childOffset.dx,
           child: AbsorbPointer(
-            absorbing: true,
             child: SizedBox(
               width: childSize.width,
               height: childSize.height,

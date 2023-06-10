@@ -4,12 +4,14 @@ import 'package:flutter_dialog/ui/views/messages_screen/messages_screen_state.da
 import 'package:flutter_dialog/ui/views/messages_screen/messages_screen_view_model.dart';
 import 'package:provider/provider.dart';
 
+/// A widget representing the loading state of messages.
 class MessageLoading extends StatelessWidget {
-  const MessageLoading({Key? key}) : super(key: key);
+  /// Creates a new instance of the [MessageLoading] class.
+  const MessageLoading({super.key});
 
   @override
   Widget build(BuildContext context) {
-    MessagesScreenState state = context.select((MessagesScreenViewModel viewModel) => viewModel.state);
+    final MessagesScreenState state = context.select((MessagesScreenViewModel viewModel) => viewModel.state);
     return Visibility(
       visible: state.loading,
       child: Align(
